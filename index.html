@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spread Wings | EG-50 Long-Endurance UAV</title>
+  <meta name="description" content="Spread Wings EG-50: a long-endurance fixed-wing UAV platform built for government programs, with in-house design, molds and manufacturing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <svg class="loader-wing" viewBox="0 0 120 60" aria-hidden="true">
+        <path d="M60 4 L114 54 L60 44 L6 54 Z" />
+      </svg>
+      <div class="loader-text">SPREAD WINGS</div>
+      <div class="loader-bar"><span id="loaderBar"></span></div>
+    </div>
+  </div>
+
+  <!-- 3D stage -->
+  <canvas id="stage" aria-hidden="true"></canvas>
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <!-- HUD overlay (motion graphics) -->
+  <div class="hud" aria-hidden="true">
+    <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
+    <div class="hud-corner bl"></div><div class="hud-corner br"></div>
+    <div class="hud-readout">
+      <span>ALT <b id="hudAlt">0000</b> m</span>
+      <span>SPD <b id="hudSpd">000</b> km/h</span>
+      <span>HDG <b id="hudHdg">000</b>°</span>
+    </div>
+    <div class="hud-chapter"><span id="hudIdx">01</span> / 07 — <span id="hudName">Overview</span></div>
+  </div>
+
+  <header class="nav">
+    <a href="#hero" class="brand">
+      <svg viewBox="0 0 120 60" aria-hidden="true"><path d="M60 4 L114 54 L60 44 L6 54 Z"/></svg>
+      <span>SPREAD<em>WINGS</em></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#concept">Concept</a>
+      <a href="#design">Design</a>
+      <a href="#build">Build</a>
+      <a href="#launcher">Launcher</a>
+      <a href="#specs">Specs</a>
+    </nav>
+    <a href="#contact" class="btn btn-sm">Enquire</a>
+  </header>
+
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <main>
+    <!-- 01 HERO -->
+    <section class="chapter hero" id="hero" data-name="Overview">
+      <div class="wrap">
+        <p class="eyebrow reveal">Spread Wings · Aerospace Systems</p>
+        <h1 class="reveal">EG-50<span class="outline">Spread Wings</span></h1>
+        <p class="lead reveal">A long-endurance fixed-wing UAV, designed, molded and built in-house for government and defence programs.</p>
+        <div class="hero-stats reveal">
+          <div><b data-count="1000">0</b><small>km range</small></div>
+          <div><b data-count="6.5" data-dec="1">0</b><small>h endurance</small></div>
+          <div><b data-count="2.8" data-dec="1">0</b><small>m wingspan</small></div>
+        </div>
+      </div>
+      <a href="#concept" class="scroll-cue">Scroll to begin <i></i></a>
+    </section>
+
+    <!-- 02 CONCEPT -->
+    <section class="chapter" id="concept" data-name="Concept">
+      <div class="wrap split right">
+        <div class="panel reveal">
+          <p class="eyebrow">Chapter 02 · Concept</p>
+          <h2>Built around the patrol mission.</h2>
+          <p>The EG-50 began as a patrol aircraft concept. It pairs a guided seeker head with an onboard autopilot, so it can hold a patrol over a designated area for hours and switch modes once a target is found and located.</p>
+          <ol class="mission">
+            <li><span>01</span><div><b>Launch</b><small>Rail launch from a towed frame</small></div></li>
+            <li><span>02</span><div><b>Patrol</b><small>Autonomous GNSS + IMU navigation</small></div></li>
+            <li><span>03</span><div><b>Locate</b><small>Guided seeker head acquisition</small></div></li>
+            <li><span>04</span><div><b>Engage</b><small>Mode switch on confirmed target</small></div></li>
+          </ol>
+        </div>
+      </div>
+      <svg class="flightpath" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
+        <path id="flightPath" d="M0 280 C 180 260, 220 80, 380 90 S 560 200, 640 120 S 800 40, 860 120 L 1000 270"/>
+      </svg>
+    </section>
+
+    <!-- 03 DESIGN -->
+    <section class="chapter" id="design" data-name="Design">
+      <div class="wrap split left">
+        <div class="panel reveal">
+          <p class="eyebrow">Chapter 03 · Design</p>
+          <h2>Four principles, one airframe.</h2>
+          <div class="pillars">
+            <div class="pillar"><i>01</i><b>Good design</b><small>A delta wing with tip fins, tuned in CAD for stability and range.</small></div>
+            <div class="pillar"><i>02</i><b>Good mold</b><small>Precision tooling cut straight from the design data.</small></div>
+            <div class="pillar"><i>03</i><b>Good technology</b><small>Composite layup, an integrated autopilot and a proven powerplant.</small></div>
+            <div class="pillar"><i>04</i><b>Good product</b><small>Repeatable, field-ready airframes, one after the next.</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-strip reveal">
+        <figure><img src="assets/cad-hero.jpg" alt="CAD render of the EG-50 airframe" loading="lazy"><figcaption>CAD · External form</figcaption></figure>
+        <figure><img src="assets/cad-rear.jpg" alt="CAD render showing the rear engine mount" loading="lazy"><figcaption>CAD · Powerplant integration</figcaption></figure>
+        <figure><img src="assets/prototype.jpg" alt="Full-scale prototype airframe standing upright" loading="lazy"><figcaption>Full-scale prototype</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 04 BUILD -->
+    <section class="chapter" id="build" data-name="Manufacturing">
+      <div class="wrap split right">
+        <div class="panel reveal">
+          <p class="eyebrow">Chapter 04 · Manufacturing</p>
+          <h2>From CAD to mold to airframe, held to design tolerance.</h2>
+          <p>Molds and parts are made to match the design data exactly. Every fuselage section that comes out of our tooling meets the same tolerance as the CAD model it came from.</p>
+          <div class="compare" id="compare">
+            <img src="assets/mold.jpg" alt="Composite fuselage mold on the workshop floor">
+            <div class="compare-top" id="compareTop"><img src="assets/cad-fuselage.jpg" alt="CAD detail of the fuselage segments"></div>
+            <input type="range" min="0" max="100" value="50" id="compareRange" aria-label="Compare CAD design with physical mold">
+            <span class="compare-label l">CAD</span><span class="compare-label r">MOLD</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 FINAL PRODUCT -->
+    <section class="chapter" id="product" data-name="Final Product">
+      <div class="wrap split left">
+        <div class="panel reveal">
+          <p class="eyebrow">Chapter 05 · Final Product</p>
+          <h2>Shaped by the engine and by the customer.</h2>
+          <p>The final airframe is designed around its engine's characteristics and each customer's operating requirements. Production fuselages come off the line ready for integration and field trials.</p>
+        </div>
+      </div>
+      <div class="photo-pair">
+        <figure class="reveal"><img src="assets/field.jpg" alt="EG-50 airframe during field trials" loading="lazy"><figcaption>Field trials</figcaption></figure>
+        <figure class="reveal"><img src="assets/fuselages.jpg" alt="Production fuselages in the workshop" loading="lazy"><figcaption>Production fuselages</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 06 LAUNCHER -->
+    <section class="chapter" id="launcher" data-name="Launch System">
+      <div class="wrap split right">
+        <div class="panel reveal">
+          <p class="eyebrow">Chapter 06 · Launch System</p>
+          <h2>Tow it, deploy it, launch it.</h2>
+          <ul class="ticks">
+            <li>Towed ejection frame that any utility vehicle can pull</li>
+            <li>Easy to move between sites</li>
+            <li>Quick start from tow to flight</li>
+            <li>Launcher extends to <b>12 m</b></li>
+          </ul>
+          <div class="meter"><span>0 m</span><div class="meter-track"><i id="railMeter"></i></div><span>12 m</span></div>
+        </div>
+      </div>
+      <div class="launcher-photos">
+        <figure class="reveal"><img src="assets/launcher-tow.jpg" alt="Launcher frame towed behind a vehicle" loading="lazy"><figcaption>Road tow</figcaption></figure>
+        <figure class="reveal"><img src="assets/launcher-field.jpg" alt="Launcher deployed in the field" loading="lazy"><figcaption>Deployed rail</figcaption></figure>
+        <figure class="reveal"><img src="assets/launcher-frame.jpg" alt="Launcher frame detail" loading="lazy"><figcaption>Ejection frame</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 07 SPECS -->
+    <section class="chapter specs" id="specs" data-name="Specifications">
+      <div class="wrap">
+        <p class="eyebrow reveal">Chapter 07 · Technical Index</p>
+        <h2 class="reveal">EG-50 technical specifications</h2>
+
+        <div class="spec-hero reveal">
+          <div class="dim"><span>Full length</span><b data-count="3.3" data-dec="1">0</b><em>m</em></div>
+          <div class="dim"><span>Wingspan</span><b data-count="2.8" data-dec="1">0</b><em>m</em></div>
+          <div class="dim"><span>Height</span><b data-count="0.4" data-dec="1">0</b><em>m</em></div>
+        </div>
+
+        <div class="spec-tabs reveal" role="tablist">
+          <button class="active" data-tab="perf" role="tab">Performance</button>
+          <button data-tab="weight" role="tab">Weight &amp; Airframe</button>
+          <button data-tab="power" role="tab">Power &amp; Systems</button>
+        </div>
+
+        <div class="spec-grid" data-panel="perf">
+          <div class="spec"><span>Flight range</span><b>1000 <em>km</em></b><i style="--v:1"></i></div>
+          <div class="spec"><span>Endurance</span><b>6.5 <em>h</em></b><i style="--v:.92"></i></div>
+          <div class="spec"><span>Sea-level max flight speed</span><b>220 <em>km/h</em></b><i style="--v:.85"></i></div>
+          <div class="spec"><span>Terminal speed</span><b>260 <em>km/h</em></b><i style="--v:1"></i></div>
+          <div class="spec"><span>Cruising speed</span><b>160 <em>km/h</em></b><i style="--v:.62"></i></div>
+          <div class="spec"><span>Stall speed</span><b>95 <em>km/h</em></b><i style="--v:.37"></i></div>
+          <div class="spec"><span>Service ceiling</span><b>3500 <em>m MSL</em></b><i style="--v:.7"></i></div>
+          <div class="spec"><span>Max climb rate</span><b>5 <em>m/s</em></b><i style="--v:.5"></i></div>
+          <div class="spec"><span>Max wind resistance</span><b>Level 6 <em>10.8–13.8 m/s</em></b><i style="--v:.6"></i></div>
+        </div>
+        <div class="spec-grid" data-panel="weight" hidden>
+          <div class="spec"><span>Max takeoff weight</span><b>150 <em>kg</em></b><i style="--v:1"></i></div>
+          <div class="spec"><span>Max payload capacity</span><b>50 <em>kg</em></b><i style="--v:.33"></i></div>
+          <div class="spec"><span>Full length</span><b>3.3 <em>m</em></b><i style="--v:1"></i></div>
+          <div class="spec"><span>Wingspan</span><b>2.8 <em>m</em></b><i style="--v:.85"></i></div>
+          <div class="spec"><span>Full height</span><b>0.4 <em>m</em></b><i style="--v:.12"></i></div>
+        </div>
+        <div class="spec-grid" data-panel="power" hidden>
+          <div class="spec"><span>Dynamic system</span><b>Quad-cylinder <em>2-stroke gasoline</em></b><i style="--v:1"></i></div>
+          <div class="spec"><span>Engine displacement</span><b>550 <em>cc</em></b><i style="--v:.75"></i></div>
+          <div class="spec"><span>Fuel type</span><b>93# + <em>2-stroke lubricant</em></b><i style="--v:.6"></i></div>
+          <div class="spec"><span>Autopilot</span><b>GNSS + IMU <em>navigation</em></b><i style="--v:1"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+      <div class="wrap">
+        <div class="marquee" aria-hidden="true"><div>GOOD DESIGN · GOOD MOLD · GOOD TECHNOLOGY · GOOD PRODUCT · GOOD DESIGN · GOOD MOLD · GOOD TECHNOLOGY · GOOD PRODUCT ·&nbsp;</div></div>
+        <h2>Programs &amp; procurement</h2>
+        <p class="lead">We supply authorized government agencies and approved defence partners only. Send an enquiry and our program team will reply.</p>
+        <form class="contact-form" onsubmit="event.preventDefault(); this.classList.add('sent');">
+          <input type="text" placeholder="Name" required aria-label="Name">
+          <input type="text" placeholder="Organization / Agency" required aria-label="Organization">
+          <input type="email" placeholder="Official email" required aria-label="Email">
+          <textarea placeholder="Program requirements" rows="3" aria-label="Requirements"></textarea>
+          <button class="btn" type="submit">Send enquiry</button>
+          <p class="sent-msg">Thank you. Our program team will get in touch.</p>
+        </form>
+      </div>
+      <footer>
+        <span>© Spread Wings. All rights reserved.</span>
+        <span>All exports are subject to applicable government authorization.</span>
+      </footer>
+    </section>
+  </main>
+
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
