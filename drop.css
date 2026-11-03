@@ -41,40 +41,20 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .boot-bar span { display: block; height: 100%; width: 0; background: var(--red); transition: width .2s; }
 @keyframes pulse { 50% { opacity: .35; } }
 
-/* ---------- World (sceneries) ---------- */
-.world, .wipe, #stage, .mega, .tags, .flash, .shock { position: fixed; inset: 0; pointer-events: none; }
-.world { z-index: 0; overflow: hidden; transform: translate(var(--shake-x), var(--shake-y)) scale(1.04); }
-.scene .boom { position: absolute; inset: 0; background: radial-gradient(60% 45% at 50% 78%, rgba(255,170,80,.85), rgba(255,90,30,.35) 45%, transparent 75%); mix-blend-mode: screen; opacity: 0; }
-.scene { position: absolute; inset: 0; opacity: 0; will-change: opacity; }
-.scene .sky { position: absolute; inset: 0; }
-.scene .layer {
-  position: absolute; left: -6%; width: 112%; top: 0; height: 170%;
-  will-change: transform;
-  transform-origin: 50% 40%;
-}
-.scene .layer svg { width: 100%; height: 100%; display: block; }
-.scene .stars { position: absolute; inset: 0; }
-
-.wipe {
-  z-index: 3;
-  background:
-    radial-gradient(40% 30% at 20% 60%, rgba(255,255,255,.95), transparent 70%),
-    radial-gradient(45% 35% at 70% 40%, rgba(255,255,255,.9), transparent 70%),
-    radial-gradient(35% 30% at 50% 80%, rgba(230,240,255,.95), transparent 70%),
-    radial-gradient(50% 40% at 85% 85%, rgba(255,255,255,.85), transparent 70%);
-  filter: blur(8px);
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
+/* ---------- Stage ---------- */
+.vids { position: fixed; left: 0; top: 0; width: 2px; height: 2px; overflow: hidden; opacity: 0; pointer-events: none; }
+.vids video { width: 2px; height: 2px; }
+#stage, .mega, .tags, .flash { position: fixed; inset: 0; pointer-events: none; }
+#stage { background: #02040a; }
 #stage { z-index: 4; pointer-events: auto; }
 body.dragging #stage { cursor: grabbing; }
 #stage.hovering { cursor: zoom-in; }
 
 .mega {
-  z-index: 2;
+  z-index: 5;
   display: grid; place-items: center;
   font-weight: 700;
+  opacity: .55;
   font-size: clamp(64px, 17vw, 300px);
   letter-spacing: -.04em;
   line-height: .85;
@@ -244,14 +224,6 @@ body.outro-on .log, body.outro-on .timeline { opacity: 0; pointer-events: none; 
 
 /* ---------- Impact ---------- */
 .flash { z-index: 12; background: radial-gradient(circle at 50% 70%, #fff 0%, #fff6dc 35%, #ffd38a 70%, #ff8a3d 100%); opacity: 0; }
-.shock { z-index: 5; display: grid; place-items: end center; overflow: hidden; }
-.shock::before {
-  content: ""; width: 40vw; height: 8vw; margin-bottom: calc(22vh - 4vw);
-  border-radius: 50%;
-  border: 3px solid rgba(255,230,190,.9);
-  box-shadow: 0 0 60px 20px rgba(255,180,90,.35), inset 0 0 60px rgba(255,200,120,.4);
-  transform: scale(var(--ring, 0)); opacity: var(--ring-o, 0);
-}
 
 /* ---------- Outro ---------- */
 .outro {
