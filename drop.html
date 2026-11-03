@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spread Wings | Operation Sundown</title>
+  <meta name="description" content="Operation Sundown: a fictional cinematic story. One EG-50, one payload, ninety-two seconds of fall, scanned live all the way down.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="drop.css">
+</head>
+<body>
+  <!-- Boot sequence -->
+  <div class="boot" id="boot">
+    <div class="boot-inner">
+      <svg class="boot-wing" viewBox="0 0 120 60" aria-hidden="true"><path d="M60 4 L114 54 L60 44 L6 54 Z"/></svg>
+      <pre id="bootLog"></pre>
+      <div class="boot-bar"><span id="bootBar"></span></div>
+    </div>
+  </div>
+
+  <!-- Natural sceneries, generated in drop.js -->
+  <div class="world" id="world" aria-hidden="true"></div>
+  <div class="wipe" id="wipe" aria-hidden="true"></div>
+
+  <!-- Kinetic scene title behind the payload -->
+  <div class="mega" id="mega" aria-hidden="true"></div>
+
+  <!-- 3D stage: drone, payload, teardown, mushroom cloud -->
+  <canvas id="stage"></canvas>
+
+  <!-- Teardown labels, focus reticle -->
+  <div class="tags" id="tags"></div>
+  <div class="reticle" id="reticle" aria-hidden="true"><i></i><i></i><i></i><i></i><b id="reticleZoom">×4.0</b></div>
+
+  <!-- HUD -->
+  <div class="hud" aria-hidden="true">
+    <div class="hud-c tl"></div><div class="hud-c tr"></div><div class="hud-c bl"></div><div class="hud-c br"></div>
+    <div class="hud-top">
+      <span>ALT <b id="hAlt">18 000</b> m</span>
+      <span>VEL <b id="hVel">000</b> m/s</span>
+      <span>T <b id="hT">−00:20.0</b></span>
+      <span class="scan" id="hScan">SCAN · OFF</span>
+    </div>
+    <div class="hud-alt"><i id="hAltBar"></i></div>
+  </div>
+
+  <header class="nav">
+    <a href="index.html" class="brand">
+      <svg viewBox="0 0 120 60" aria-hidden="true"><path d="M60 4 L114 54 L60 44 L6 54 Z"/></svg>
+      <span>SPREAD<em>WINGS</em></span>
+    </a>
+    <span class="op">OPERATION SUNDOWN</span>
+    <a href="index.html" class="btn btn-sm">EG-50</a>
+  </header>
+
+  <!-- Story timeline rail -->
+  <aside class="timeline" id="timeline" aria-label="Story timeline">
+    <div class="tl-track"><i id="tlFill"></i></div>
+    <ol id="tlList"></ol>
+  </aside>
+
+  <!-- Story log card -->
+  <div class="log" id="log" aria-live="polite">
+    <div class="log-head"><span id="logStamp">T−00:20</span><span id="logPlace">Stratosphere</span></div>
+    <h2 id="logTitle"></h2>
+    <p id="logText"></p>
+  </div>
+
+  <!-- Part dossier (hover / tap a part). The zoom window is a hole the 3D canvas renders into. -->
+  <div class="dossier" id="dossier" role="dialog" aria-label="Part details">
+    <div class="d-zoom" id="dZoom"><span>LIVE ZOOM</span></div>
+    <div class="d-info">
+      <div class="d-id"><span id="dIdx">01</span><em id="dCode">ARROWHEAD</em></div>
+      <h3 id="dName">Nose fairing</h3>
+      <p id="dText"></p>
+      <dl id="dStats"></dl>
+    </div>
+  </div>
+
+  <!-- Parts index (also the touch-friendly way in) -->
+  <nav class="parts" id="parts" aria-label="Payload parts"></nav>
+
+  <!-- Impact flash + shockwave -->
+  <div class="shock" id="shock" aria-hidden="true"></div>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+
+  <!-- Epilogue -->
+  <section class="outro" id="outro">
+    <p class="eyebrow">T+01:32 · Ground zero</p>
+    <h1 id="outroTitle">SPREAD WINGS</h1>
+    <p class="lead">Ninety-two seconds. Eighteen kilometres. Every bolt of it seen, scanned and sent home by one aircraft.</p>
+    <div class="outro-cta">
+      <a class="btn" href="index.html">Meet the EG-50</a>
+      <button class="btn ghost" id="replay" type="button">Replay the drop</button>
+    </div>
+    <small class="disclaimer">Operation Sundown is a fictional cinematic concept. The payload, mission, places and people are imaginary.</small>
+  </section>
+
+  <!-- Scroll length: each block is one beat of the story -->
+  <main class="track" id="track">
+    <section></section><section></section><section></section><section></section>
+    <section></section><section></section><section></section><section></section>
+  </main>
+
+  <div class="cue" id="cue">Scroll to release <i></i></div>
+
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="drop.js"></script>
+</body>
+</html>
