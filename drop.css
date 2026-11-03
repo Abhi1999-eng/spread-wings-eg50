@@ -151,10 +151,14 @@ body.outro-on .log, body.outro-on .timeline { opacity: 0; pointer-events: none; 
 }
 .tag::before { content: ""; position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--cyan); background: rgba(111,227,255,.25); }
 .tag span {
-  position: absolute; left: 18px; bottom: 18px;
-  padding: 6px 9px; background: rgba(4,11,24,.72); border: 1px solid rgba(111,227,255,.4);
+  position: absolute; left: 0; transform: translateX(-50%);
+  padding: 6px 9px; background: rgba(4,11,24,.82); border: 1px solid rgba(111,227,255,.4);
 }
-.tag span::after { content: ""; position: absolute; left: -18px; bottom: -18px; width: 24px; height: 1px; background: rgba(111,227,255,.6); transform-origin: 0 0; transform: rotate(-45deg) translate(0, 0); }
+.tag::after { content: ""; position: absolute; left: -0.5px; width: 1px; height: calc(var(--len) - 4px); background: rgba(111,227,255,.55); }
+.tag.up span { bottom: var(--len); }
+.tag.up::after { bottom: 4px; }
+.tag.down span { top: var(--len); }
+.tag.down::after { top: 4px; }
 .tag em { font-style: normal; color: var(--cyan); margin-right: 6px; }
 .tag.active span { border-color: var(--amber); background: rgba(40,20,0,.75); }
 .tag.active em { color: var(--amber); }
@@ -276,6 +280,7 @@ body.outro-on .log, body.outro-on .timeline { opacity: 0; pointer-events: none; 
   .parts { gap: 4px; flex-wrap: nowrap; }
   .parts button { min-width: 0; flex: 1; height: 34px; padding: 0; }
   .tag span { display: none; }
+  .tag::after { display: none; }
 }
 @media (max-width: 560px) {
   .hud-top span:nth-child(3) { display: none; }

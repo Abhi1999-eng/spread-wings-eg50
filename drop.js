@@ -827,6 +827,8 @@ BEATS.forEach((b, i) => {
 });
 const tlItems = [...tlList.children];
 
+// leader length (px) per label, + above the part, − below; alternating so neighbours never collide
+const TAG_ROW = { tail: 78, cradle: -78, core: 124, power: -124, telemetry: 78, sensor: -78, nose: 124, shell: 56, lug: 44 };
 const tagsEl = $('tags');
 const tags = {};
 const partsNav = $('parts');
@@ -835,7 +837,8 @@ PART_ORDER.forEach((k) => {
   const p = parts[k];
   const n = String(p.idx).padStart(2, '0');
   const t = document.createElement('div');
-  t.className = 'tag';
+  t.className = `tag ${TAG_ROW[k] > 0 ? 'up' : 'down'}`;
+  t.style.setProperty('--len', `${Math.abs(TAG_ROW[k])}px`);
   t.innerHTML = `<span><em>${n}</em>${INFO[k].code}</span>`;
   t.addEventListener('pointerenter', () => setHover(k));
   t.addEventListener('pointerleave', () => setHover(null));
@@ -1170,8 +1173,8 @@ function tick() {
     tiltG.rotation.z = settle + tiltTarget * (Math.PI / 2);
     const calm = 1 - focusAmt * 0.85;
     bombRig.rotation.set(
-      Math.sin(time * 1.3) * 0.05 * calm * (1 - ex) + mouse.y * 0.08 * ex * calm,
-      (Math.sin(time * 0.28) * 0.2 + mouse.x * 0.15) * ex * calm,
+      Math.sin(time * 1.3) * 0.05 * calm * (1 - ex),
+      0,
       Math.sin(time * 1.7) * 0.04 * calm * (1 - ex),
     );
   }
@@ -1274,7 +1277,8 @@ function tick() {
   const fw = easeIO(Math.max(focusAmt, autoCore));
   const fDist = mobile ? 5 : 3.2;
   const startLook = 0.45 * (1 - range(sv, 0.4, 1.2));
-  tmpV.set(mouse.x * 0.35 * (1 - fw), startLook + 0.1 - mouse.y * 0.2 * (1 - fw), baseZ);
+  const hold = (1 - fw) * (1 - ex);
+  tmpV.set(mouse.x * 0.35 * hold, startLook + 0.1 - mouse.y * 0.2 * hold, baseZ);
   camLook.set(0, startLook, 0);
   // dolly along the line of sight: the focused part grows in place, right under the cursor
   tmpV2.subVectors(focusPos, tmpV);
@@ -1286,7 +1290,7 @@ function tick() {
   // shake: buffeting grows with speed, impact is violent
   const speedShake = reduced ? 0 : 0.006 + fallT * 0.02 + terminal * 0.09;
   const impactShake = reduced ? 0 : (after ? Math.exp(-(sv - IMPACT) * 7) * 0.35 : 0);
-  const sh = (speedShake * (1 - focusAmt) + impactShake);
+  const sh = (speedShake * (1 - focusAmt) * (1 - ex) + impactShake);
   shakeT += dt * 60;
   const sx = (Math.sin(shakeT * 1.7) + Math.sin(shakeT * 2.9)) * sh;
   const sy = (Math.cos(shakeT * 2.3) + Math.sin(shakeT * 3.7)) * sh;
@@ -1367,9 +1371,13 @@ function tick() {
     if (k === 'shell') tmpV.set(0.44, 0.2, 0).applyMatrix4(halves[0].matrixWorld);
     else p.group.localToWorld(tmpV);
     tmpV.project(camera);
+    // eased and snapped to whole pixels so nothing shimmers
     const x = (tmpV.x * 0.5 + 0.5) * window.innerWidth;
     const y = (-tmpV.y * 0.5 + 0.5) * window.innerHeight;
-    t.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+    t._x = t._x === undefined || t.style.opacity === '0' ? x : damp(t._x, x, 14, dt);
+    t._y = t._y === undefined || t.style.opacity === '0' ? y : damp(t._y, y, 14, dt);
+    const px = Math.round(t._x), py = Math.round(t._y);
+    if (px !== t._px || py !== t._py) { t._px = px; t._py = py; t.style.transform = `translate3d(${px}px, ${py}px, 0)`; }
     t.style.opacity = (range(ex, 0.55, 0.85) * (1 - focusAmt * 0.6)).toFixed(3);
     t.style.pointerEvents = 'auto';
   });
