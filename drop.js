@@ -5,6 +5,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import Lenis from 'lenis';
 
 /* =========================================================
    Helpers
@@ -89,7 +90,11 @@ function rand(seed) {
    ========================================================= */
 const canvas = $('stage');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+// render resolution never drops below the CSS pixel grid; it only climbs toward retina when the GPU has headroom
+const PR_MAX = Math.min(window.devicePixelRatio, 2);
+const PR_MIN = Math.min(window.devicePixelRatio, 1);
+let pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+renderer.setPixelRatio(pixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.NoToneMapping;   // keep the footage colours exactly as graded
 renderer.shadowMap.enabled = true;
@@ -149,7 +154,7 @@ function manageClips(sv, rate) {
     const active = c.loaded && sv > i - 0.25 && (i === 6 || sv < i + 1.25);
     if (active && c.v.paused) c.v.play().catch(() => {});
     if (!active && !c.v.paused) c.v.pause();
-    if (active) c.v.playbackRate = rate;
+    if (active && Math.abs(c.v.playbackRate - rate) > 0.05) c.v.playbackRate = rate;
   });
 }
 
@@ -193,9 +198,13 @@ const bgMat = new THREE.ShaderMaterial({
     vec3 clip(sampler2D t, vec2 uv, float zoom, float drift, float shift) {
       vec2 tuv = (cover(uv + shake) - 0.5) / zoom + 0.5;
       tuv.y += drift + shift;
-      vec3 c = vec3(0.0);
       float r = focusBlur * 0.012;
       float sp = speedBlur * 0.05;
+      if (r + sp < 0.0005) {
+        vec3 c0 = texture2D(t, clamp(tuv, 0.001, 0.999)).rgb;
+        return shift > 0.0 ? mix(c0, night(uv), smoothstep(0.9, 1.0, tuv.y)) : c0;
+      }
+      vec3 c = vec3(0.0);
       for (int i = 0; i < 9; i++) {
         float fi = float(i);
         float a = fi * 2.39996;
@@ -237,10 +246,11 @@ envCanvas.width = 256; envCanvas.height = 128;
 const envCtx = envCanvas.getContext('2d');
 const envTex = new THREE.CanvasTexture(envCanvas);
 envTex.colorSpace = THREE.SRGBColorSpace;
-let envRT = null, envClock = -1;
-function updateEnv(c, now) {
-  if (now - envClock < 0.6 || !clipReady(c)) return;
-  envClock = now;
+let envRT = null, envFor = '';
+function updateEnv(c) {
+  const tag = c.name + (c.v.readyState >= 2 ? ':v' : ':p');
+  if (tag === envFor || !clipReady(c)) return;
+  envFor = tag;
   envCtx.drawImage(c.v.readyState >= 2 ? c.v : c.poster.image, 0, 0, 256, 128);
   envTex.needsUpdate = true;
   const rt = pmrem.fromEquirectangular(envTex);
@@ -251,11 +261,11 @@ function updateEnv(c, now) {
 
 /* ---------- Post: bloom + lens (grain, vignette, chromatic aberration) ---------- */
 const composer = new EffectComposer(renderer);
-composer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+composer.setPixelRatio(pixelRatio);
 const bgPass = new RenderPass(bgScene, bgCam);
 const mainPass = new RenderPass(scene, camera);
 mainPass.clear = false;
-const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.55, 0.65, 0.88);
+const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2), 0.55, 0.65, 0.88);
 const lens = new ShaderPass({
   uniforms: { tDiffuse: { value: null }, time: { value: 0 }, grain: { value: 0.045 }, vignette: { value: 0.55 }, ca: { value: 0.002 }, aspect: { value: 1 } },
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -411,7 +421,7 @@ const bumpTex = canvasTex(1024, 512, (g, w, h) => {
 const paintA = paintTex(true), paintB = paintTex(false);
 const painted = (map, extra = {}) => new THREE.MeshPhysicalMaterial({
   transparent: true, map, roughnessMap: wearTex, metalnessMap: wearTex, bumpMap: bumpTex, bumpScale: 1.2,
-  roughness: 1, metalness: 1, clearcoat: 0.15, clearcoatRoughness: 0.7, emissive: 0x000000, ...extra,
+  roughness: 1, metalness: 1, emissive: 0x000000, ...extra,
 });
 const circuitTex = canvasTex(512, 256, (g, w, h) => {
   g.fillStyle = '#062019'; g.fillRect(0, 0, w, h);
@@ -667,7 +677,7 @@ streaks.layers.set(1);
 streaks.frustumCulled = false;
 scene.add(streaks);
 
-const PUFFS = 26;
+const PUFFS = 22;
 const puffs = Array.from({ length: PUFFS }, (_, i) => {
   const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, color: 0xffffff, transparent: true, opacity: 0, depthWrite: false }));
   m.position.set((Math.random() - 0.5) * 16, (Math.random() - 0.5) * 16, -6 + Math.random() * 10);
@@ -882,14 +892,20 @@ function showBeat(i, now) {
   logPlace.textContent = b.place;
   logTitle.textContent = b.title;
   typing = { text: b.text, start: now };
+  typedN = -1;
   tlItems.forEach((li, n) => { li.classList.toggle('now', n === i); li.classList.toggle('past', n < i); });
   buildMega(b.mega);
 }
+let typedN = -1;
 function updateTyping(now) {
-  const n = Math.floor((now - typing.start) * 70);
+  const n = Math.min(Math.floor((now - typing.start) * 70), typing.text.length);
+  if (n === typedN) return;
+  typedN = n;
   const done = n >= typing.text.length;
-  logText.innerHTML = (done ? typing.text : typing.text.slice(0, n)) + (done ? '' : '<span class="caret"></span>');
+  logText.innerHTML = typing.text.slice(0, n) + (done ? '' : '<span class="caret"></span>');
 }
+// write text only when it changes
+const setText = (el, v) => { if (el._v !== v) { el._v = v; el.textContent = v; } };
 
 // Kinetic scene titles
 const mega = $('mega');
@@ -920,23 +936,33 @@ function updateMega(t) {
    Scroll → story clock
    ========================================================= */
 const sections = [...document.querySelectorAll('.track section')];
+// section geometry is cached: reading offsetTop every frame forces a layout after each DOM write
+let secTops = [], secHs = [], scrollMax = 1;
+function measureSections() {
+  secTops = sections.map((el) => el.offsetTop);
+  secHs = sections.map((el) => el.offsetHeight);
+  scrollMax = document.documentElement.scrollHeight - window.innerHeight;
+}
 function readScroll() {
   const y = window.scrollY;
-  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const max = scrollMax;
   for (let i = 0; i < sections.length; i++) {
-    const top = sections[i].offsetTop;
+    const top = secTops[i];
     const last = i === sections.length - 1;
-    const h = last ? Math.max(1, max - top) : sections[i].offsetHeight;
+    const h = last ? Math.max(1, max - top) : secHs[i];
     if (y < top + h || last) return THREE.MathUtils.clamp(i + (y - top) / h, 0, sections.length);
   }
   return 0;
 }
+// inertial wheel/trackpad scrolling; touch keeps the native feel
+const lenis = reduced ? null : new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, smoothWheel: true });
 function scrollToBeat(sv) {
-  const i = Math.floor(sv);
-  const sec = sections[Math.min(i, sections.length - 1)];
-  window.scrollTo({ top: sec.offsetTop + (sv - i) * sec.offsetHeight, behavior: 'smooth' });
+  const i = Math.min(Math.floor(sv), sections.length - 1);
+  const top = secTops[i] + (sv - i) * secHs[i];
+  if (lenis) lenis.scrollTo(top, { duration: 2.2 });
+  else window.scrollTo({ top, behavior: 'smooth' });
 }
-$('replay').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+$('replay').addEventListener('click', () => (lenis ? lenis.scrollTo(0, { duration: 4 }) : window.scrollTo({ top: 0, behavior: 'smooth' })));
 
 /* =========================================================
    Pointer + picking
@@ -985,7 +1011,7 @@ function layout() {
   const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h);
   composer.setSize(w, h);
-  bloom.resolution.set(w, h);
+  bloom.setSize(w * pixelRatio / 2, h * pixelRatio / 2);
   bgUniforms.viewAspect.value = w / h;
   lens.uniforms.aspect.value = w / h;
   camera.aspect = w / h;
@@ -994,10 +1020,29 @@ function layout() {
   const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * (baseZ + 7);
   gz.set(0, (2 * HORIZON - 1) * half, -7);   // sits on the desert horizon in the wide shot
   mushRig.position.copy(gz);
-  mMat.uniforms.uScale.value = (h * renderer.getPixelRatio()) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+  mMat.uniforms.uScale.value = (h * pixelRatio) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+  measureSections();
 }
 window.addEventListener('resize', layout);
+window.addEventListener('load', measureSections);
 layout();
+
+// hold ~60 fps: trim render resolution (never below native CSS pixels) when frames run long, add it back with headroom
+let ftAvg = 16.7, ftCount = 0;
+function adaptQuality(ms) {
+  if (ms > 100) return;                      // tab was hidden
+  ftAvg = ftAvg * 0.94 + ms * 0.06;
+  if (++ftCount < 50) return;
+  let next = pixelRatio;
+  if (ftAvg > 19 && pixelRatio > PR_MIN) next = Math.max(PR_MIN, pixelRatio - 0.125);
+  else if (ftAvg < 12.5 && pixelRatio < PR_MAX) next = Math.min(PR_MAX, pixelRatio + 0.1);
+  if (next === pixelRatio) return;
+  pixelRatio = next;
+  ftCount = 0;
+  renderer.setPixelRatio(pixelRatio);
+  composer.setPixelRatio(pixelRatio);
+  layout();
+}
 
 /* =========================================================
    Render loop
@@ -1053,7 +1098,7 @@ function updateBackground(sv, time, boomGlow, terminal, now) {
 
   // playback speeds up with the fall; footage freezes nearly still while you inspect a part
   manageClips(sv, lerp(0.85 + range(sv, 5, IMPACT) * 0.6, 0.25, focusAmt));
-  updateEnv(clips[m > 0.5 ? B : A], now);
+  updateEnv(clips[m > 0.5 ? B : A]);
 }
 
 function dronePose(sv, out) {
@@ -1066,11 +1111,14 @@ function dronePose(sv, out) {
 const dp = { pos: new THREE.Vector3(), rot: new THREE.Euler() };
 
 function tick() {
-  const dt = Math.min(clock.getDelta(), 0.05);
+  const rawDt = clock.getDelta();
+  const dt = Math.min(rawDt, 0.05);
+  adaptQuality(rawDt * 1000);
+  if (lenis) lenis.raf(performance.now());
   const time = clock.elapsedTime;
   const now = performance.now() / 1000;
 
-  s = damp(s, readScroll(), reduced ? 20 : 4.5, dt);
+  s = damp(s, readScroll(), reduced ? 20 : lenis ? 9 : 5, dt);
   const sv = s;
   const mobile = isMobile();
   const beat = Math.min(7, Math.floor(sv));
@@ -1202,7 +1250,7 @@ function tick() {
   showDossier(focusKey);
   document.body.classList.toggle('focusing', !!focusKey);
   partsNav.classList.toggle('on', sv > 2.6 && sv < 5.4);
-  hud.scan.textContent = focusKey ? `FOCUS · ${INFO[focusKey].code}` : scan > 0.5 ? 'SCAN · LIVE' : 'SCAN · OFF';
+  setText(hud.scan, focusKey ? `FOCUS · ${INFO[focusKey].code}` : scan > 0.5 ? 'SCAN · LIVE' : 'SCAN · OFF');
   hud.scan.classList.toggle('on', !focusKey && scan > 0.5);
   hud.scan.classList.toggle('lock', !!focusKey);
 
@@ -1298,11 +1346,11 @@ function tick() {
   // ---- HUD ----
   const T = released ? fallT * FALL_SECONDS : -20 * (1 - sv / RELEASE);
   const tt = Math.abs(T);
-  hud.t.textContent = `${T < 0 ? '−' : '+'}${String(Math.floor(tt / 60)).padStart(2, '0')}:${(tt % 60).toFixed(1).padStart(4, '0')}`;
+  setText(hud.t, `${T < 0 ? '−' : '+'}${String(Math.floor(tt / 60)).padStart(2, '0')}:${(tt % 60).toFixed(1).padStart(4, '0')}`);
   const alt = 18000 * (1 - Math.pow(fallT, 1.25));
-  hud.alt.textContent = Math.round(alt).toLocaleString('en-IN').replace(/,/g, ' ');
+  setText(hud.alt, String(Math.round(alt / 10) * 10).replace(/\B(?=(\d{3})+(?!\d))/g, ' '));
   const vel = released ? 295 * (1 - Math.exp(-(fallT * FALL_SECONDS) / 11)) + Math.sin(time * 7) * 2 : 0;
-  hud.vel.textContent = String(Math.max(0, Math.round(vel))).padStart(3, '0');
+  setText(hud.vel, String(Math.max(0, Math.round(vel))).padStart(3, '0'));
   hud.bar.style.top = `${(1 - alt / 18000) * 100}%`;
   tlFill.style.height = `${(Math.min(sv, 7) / 7) * 100}%`;
   cue.classList.toggle('gone', sv > 0.08);
@@ -1371,5 +1419,11 @@ function tick() {
 
   requestAnimationFrame(tick);
 }
+
+// compile every shader up front so the first impact / first hover never hitches
+mushroom.visible = true;
+renderer.compile(scene, camera);
+renderer.compile(bgScene, bgCam);
+mushroom.visible = false;
 
 tick();
