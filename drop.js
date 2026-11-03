@@ -145,13 +145,12 @@ const clips = CLIPS.map((name) => {
   return { name, v, tex, poster, loaded: false };
 });
 const clipTex = (c) => (c.v.readyState >= 2 ? c.tex : c.poster);
-const clipReady = (c) => c.v.readyState >= 2 || (c.poster.image && c.poster.image.complete);
 
 function manageClips(sv, rate) {
   const cur = THREE.MathUtils.clamp(Math.floor(sv), 0, 6);
   clips.forEach((c, i) => {
     if (!c.loaded && i >= cur - 1 && i <= cur + 1) { c.v.src = `assets/drop/${c.name}.mp4`; c.loaded = true; }
-    const active = c.loaded && sv > i - 0.25 && (i === 6 || sv < i + 1.25);
+    const active = c.loaded && sv > i - 0.45 && (i === 6 || sv < i + 1.25);   // start decoding early so the cut is clean
     if (active && c.v.paused) c.v.play().catch(() => {});
     if (!active && !c.v.paused) c.v.pause();
     if (active && Math.abs(c.v.playbackRate - rate) > 0.05) c.v.playbackRate = rate;
@@ -239,24 +238,26 @@ const bgScene = new THREE.Scene();
 bgScene.add(bgQuad);
 const bgCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-// image-based lighting taken from whatever footage is on screen
-// (the frame is copied to a small canvas first: PMREM sizes itself from image.width, which is 0 on a <video>)
+// image-based lighting from each scene's footage, prebuilt once from the posters while the boot screen runs,
+// so a scene change only swaps a texture (a PMREM bake costs tens of ms and used to hitch the transition)
+// (frames go through a small canvas: PMREM sizes itself from image.width, which is 0 on a <video>)
 const envCanvas = document.createElement('canvas');
 envCanvas.width = 256; envCanvas.height = 128;
 const envCtx = envCanvas.getContext('2d');
 const envTex = new THREE.CanvasTexture(envCanvas);
 envTex.colorSpace = THREE.SRGBColorSpace;
-let envRT = null, envFor = '';
-function updateEnv(c) {
-  const tag = c.name + (c.v.readyState >= 2 ? ':v' : ':p');
-  if (tag === envFor || !clipReady(c)) return;
-  envFor = tag;
-  envCtx.drawImage(c.v.readyState >= 2 ? c.v : c.poster.image, 0, 0, 256, 128);
+const envMaps = new Array(CLIPS.length).fill(null);
+function bakeNextEnv() {
+  const i = envMaps.findIndex((m, k) => !m && clips[k].poster.image && clips[k].poster.image.complete);
+  if (i < 0) return;
+  envCtx.drawImage(clips[i].poster.image, 0, 0, 256, 128);
   envTex.needsUpdate = true;
-  const rt = pmrem.fromEquirectangular(envTex);
-  scene.environment = rt.texture;
-  if (envRT) envRT.dispose();
-  envRT = rt;
+  envMaps[i] = pmrem.fromEquirectangular(envTex).texture;
+}
+function updateEnv(i) {
+  if (envMaps.includes(null)) bakeNextEnv();      // at most one bake per frame, done during boot
+  const m = envMaps[i];
+  if (m && scene.environment !== m) scene.environment = m;
 }
 
 /* ---------- Post: bloom + lens (grain, vignette, chromatic aberration) ---------- */
@@ -1098,7 +1099,7 @@ function updateBackground(sv, time, boomGlow, terminal, now) {
 
   // playback speeds up with the fall; footage freezes nearly still while you inspect a part
   manageClips(sv, lerp(0.85 + range(sv, 5, IMPACT) * 0.6, 0.25, focusAmt));
-  updateEnv(clips[m > 0.5 ? B : A]);
+  updateEnv(m > 0.5 ? B : A);
 }
 
 function dronePose(sv, out) {
