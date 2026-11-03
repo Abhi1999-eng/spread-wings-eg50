@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="drop.css">
+  <link rel="stylesheet" href="drop.css?v=3">
 </head>
 <body>
   <!-- Boot sequence -->
@@ -107,6 +107,30 @@
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
     } }
   </script>
-  <script type="module" src="drop.js"></script>
+  <script>
+    // boot sequence runs on its own, so a slow or failing 3D load never leaves the page stuck
+    (function () {
+      var lines = [
+        'SPREAD WINGS // GROUND STATION <b>NEST</b>',
+        '> link KESTREL-07 ............ <b>OK</b>',
+        '> airframe EG-50/HX .......... <b>NOMINAL</b>',
+        '> payload SUNDOWN ............ <b>ON PYLON</b>',
+        '> scan head .................. <b>STANDBY</b>',
+        '> altitude ................... <b>18 000 m</b>',
+        '> recording .................. <b>●</b>'
+      ];
+      var fast = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var log = document.getElementById('bootLog'), bar = document.getElementById('bootBar'), n = 0;
+      var t = setInterval(function () {
+        log.innerHTML = lines.slice(0, ++n).join('\n');
+        bar.style.width = (n / lines.length) * 100 + '%';
+        if (n >= lines.length) {
+          clearInterval(t);
+          setTimeout(function () { document.getElementById('boot').classList.add('done'); }, 450);
+        }
+      }, fast ? 40 : 190);
+    })();
+  </script>
+  <script type="module" src="drop.js?v=3"></script>
 </body>
 </html>

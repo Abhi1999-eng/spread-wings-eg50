@@ -1372,27 +1372,4 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
-/* =========================================================
-   Boot sequence
-   ========================================================= */
-const BOOT = [
-  'SPREAD WINGS // GROUND STATION <b>NEST</b>',
-  '> link KESTREL-07 ............ <b>OK</b>',
-  '> airframe EG-50/HX .......... <b>NOMINAL</b>',
-  '> payload SUNDOWN ............ <b>ON PYLON</b>',
-  '> scan head .................. <b>STANDBY</b>',
-  '> altitude ................... <b>18 000 m</b>',
-  '> recording .................. <b>●</b>',
-];
-const bootLog = $('bootLog'), bootBar = $('bootBar');
-let bl = 0;
-const bootTimer = setInterval(() => {
-  bootLog.innerHTML = BOOT.slice(0, ++bl).join('\n');
-  bootBar.style.width = `${(bl / BOOT.length) * 100}%`;
-  if (bl >= BOOT.length) {
-    clearInterval(bootTimer);
-    setTimeout(() => $('boot').classList.add('done'), 450);
-  }
-}, reduced ? 40 : 190);
-
 tick();
