@@ -901,7 +901,7 @@ function setHover(k) { hoverPart = k; }
 function togglePin(k) { pinnedPart = pinnedPart === k ? null : k; }
 
 // Chapter card: lines rise in one after another each time the chapter changes
-const log = $('log'), logStamp = $('logStamp'), logPlace = $('logPlace'), logTitle = $('logTitle'), logText = $('logText');
+const log = $('log'), logStamp = $('logStamp'), logTitle = $('logTitle'), logText = $('logText');
 let shownBeat = -1;
 function showBeat(i) {
   if (i === shownBeat) return;
@@ -912,8 +912,7 @@ function showBeat(i) {
   tlItems.forEach((li, n) => { li.classList.toggle('now', n === i - 1); li.classList.toggle('past', n < i - 1); });
   buildMega(b ? b.mega : '');
   if (!b) return;
-  logStamp.textContent = `Chapter ${String(b.n).padStart(2, '0')}`;
-  logPlace.textContent = b.name;
+  logStamp.textContent = b.name;
   logTitle.textContent = b.title;
   let k = 0;
   const line = (html) => `<span class="ln" style="--d:${(0.12 + 0.09 * k++).toFixed(2)}s">${html}</span>`;
