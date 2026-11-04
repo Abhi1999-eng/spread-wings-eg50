@@ -1456,7 +1456,8 @@ function tick() {
 // without blocking the main thread (KHR_parallel_shader_compile), so the boot animation never freezes
 // and the first impact / first hover never hitch.
 let ready = false;
-const nextFrame = () => new Promise((r) => requestAnimationFrame(r));
+// a frame, or 50 ms if frames are paused (background tab), so warm-up never stalls on rAF
+const nextFrame = () => new Promise((r) => { requestAnimationFrame(r); setTimeout(r, 50); });
 async function warmUp() {
   const t0 = performance.now();
   while (!(clips[0].poster.image && clips[0].poster.image.complete) && performance.now() - t0 < 4000) await nextFrame();
