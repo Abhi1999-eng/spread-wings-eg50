@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -117,7 +116,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const scene = new THREE.Scene();
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
 const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 120);
 const zoomCam = new THREE.PerspectiveCamera(30, 16 / 10, 0.05, 60);
@@ -304,6 +302,24 @@ composer.addPass(bloom);
 composer.addPass(new OutputPass());
 composer.addPass(lens);
 
+const grainTile = (() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const img = g.createImageData(128, 128);
+  const r = rand(77);
+  for (let i = 0; i < img.data.length; i += 4) { const v = r() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  g.putImageData(img, 0, 0);
+  return c;
+})();
+function grain(g, w, h, alpha, mode = 'overlay') {
+  g.save();
+  g.globalAlpha = alpha;
+  g.globalCompositeOperation = mode;
+  g.fillStyle = g.createPattern(grainTile, 'repeat');
+  g.fillRect(0, 0, w, h);
+  g.restore();
+}
 function canvasTex(w, h, draw, srgb = true) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
@@ -399,13 +415,7 @@ function paintTex(withText) {
       g.fillText('▲ FWD', w * 0.07, h * 0.12);
       g.fillText('LIFT', w * 0.42, h * 0.56);
     }
-    // grime noise
-    const img = g.getImageData(0, 0, w, h);
-    for (let i = 0; i < img.data.length; i += 4) {
-      const n = (r() - 0.5) * 16;
-      img.data[i] += n; img.data[i + 1] += n; img.data[i + 2] += n * 0.8;
-    }
-    g.putImageData(img, 0, 0);
+    grain(g, w, h, 0.14);
   });
 }
 // packed roughness (G) + metalness (B): scratches show bare metal
@@ -418,9 +428,7 @@ const wearTex = canvasTex(1024, 512, (g, w, h) => {
     g.lineWidth = 0.5 + r();
     g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - 0.5) * 26, y + (r() - 0.5) * 9); g.stroke();
   }
-  const img = g.getImageData(0, 0, w, h);
-  for (let i = 0; i < img.data.length; i += 4) img.data[i + 1] += (r() - 0.5) * 40;
-  g.putImageData(img, 0, 0);
+  grain(g, w, h, 0.16);
 }, false);
 const bumpTex = canvasTex(1024, 512, (g, w, h) => {
   const r = rand(12);
@@ -430,9 +438,7 @@ const bumpTex = canvasTex(1024, 512, (g, w, h) => {
   g.beginPath(); g.moveTo(w * 0.62, 0); g.lineTo(w * 0.62, h); g.stroke();
   g.fillStyle = '#e0e0e0';
   [0.2, 0.5, 0.8].forEach((v) => { for (let x = 6; x < w; x += 17) { g.beginPath(); g.arc(x, v * h + 4.5, 1.4, 0, 7); g.fill(); g.beginPath(); g.arc(x, v * h - 4.5, 1.4, 0, 7); g.fill(); } });
-  const img = g.getImageData(0, 0, w, h);
-  for (let i = 0; i < img.data.length; i += 4) { const n = (r() - 0.5) * 22; img.data[i] += n; img.data[i + 1] += n; img.data[i + 2] += n; }
-  g.putImageData(img, 0, 0);
+  grain(g, w, h, 0.09, 'source-over');
 }, false);
 const paintA = paintTex(true), paintB = paintTex(false);
 const painted = (map, extra = {}) => new THREE.MeshPhysicalMaterial({
@@ -1132,6 +1138,7 @@ function dronePose(sv, out) {
 const dp = { pos: new THREE.Vector3(), rot: new THREE.Euler() };
 
 function tick() {
+  if (!ready) { if (envMaps.includes(null)) bakeNextEnv(); requestAnimationFrame(tick); return; }
   const rawDt = clock.getDelta();
   const dt = Math.min(rawDt, 0.05);
   adaptQuality(rawDt * 1000);
@@ -1445,10 +1452,28 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
-// compile every shader up front so the first impact / first hover never hitches
-mushroom.visible = true;
-renderer.compile(scene, camera);
-renderer.compile(bgScene, bgCam);
-mushroom.visible = false;
-
+// Warm-up behind the boot screen: bake the first footage lighting, then compile every shader
+// without blocking the main thread (KHR_parallel_shader_compile), so the boot animation never freezes
+// and the first impact / first hover never hitch.
+let ready = false;
+const nextFrame = () => new Promise((r) => requestAnimationFrame(r));
+async function warmUp() {
+  const t0 = performance.now();
+  while (!(clips[0].poster.image && clips[0].poster.image.complete) && performance.now() - t0 < 4000) await nextFrame();
+  bakeNextEnv();
+  if (envMaps[0]) scene.environment = envMaps[0];
+  await nextFrame();
+  mushroom.visible = true;
+  try {
+    await renderer.compileAsync(scene, camera);
+    await renderer.compileAsync(bgScene, bgCam);
+  } catch (e) { /* fall back to compiling on first render */ }
+  mushroom.visible = false;
+  ready = true;
+  await nextFrame();
+  await nextFrame();
+  window.__swReady = true;
+  window.dispatchEvent(new Event('sw-ready'));
+}
+warmUp();
 tick();
