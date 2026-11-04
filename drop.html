@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js" crossorigin>
-  <link rel="stylesheet" href="drop.css?v=11">
+  <link rel="stylesheet" href="drop.css?v=13">
 </head>
 <body>
   <!-- Boot sequence -->
@@ -35,10 +35,10 @@
   <div class="hud" aria-hidden="true">
     <div class="hud-c tl"></div><div class="hud-c tr"></div><div class="hud-c bl"></div><div class="hud-c br"></div>
     <div class="hud-top">
-      <span>ALT <b id="hAlt">18 000</b> m</span>
-      <span>VEL <b id="hVel">000</b> m/s</span>
-      <span>T <b id="hT">−00:20.0</b></span>
-      <span class="scan" id="hScan">SCAN · OFF</span>
+      <span><span data-i18n="hudAlt">ALT</span> <b id="hAlt">18 000</b> <span data-i18n="unitM">m</span></span>
+      <span><span data-i18n="hudVel">VEL</span> <b id="hVel">000</b> <span data-i18n="unitMs">m/s</span></span>
+      <span><span data-i18n="hudTime">T</span> <b id="hT">−00:20.0</b></span>
+      <span class="scan" id="hScan"></span>
     </div>
     <div class="hud-alt"><i id="hAltBar"></i></div>
   </div>
@@ -50,7 +50,7 @@
     </a>
     <span class="op" data-i18n="op">FROM VISION TO IMPACT</span>
     <div class="nav-right">
-      <div class="lang" role="group" aria-label="Language">
+      <div class="lang" role="group" aria-label="Language" data-i18n-aria="ariaLang">
         <button type="button" data-lang="en" lang="en">EN</button>
         <button type="button" data-lang="zh" lang="zh-Hans">中文</button>
         <button type="button" data-lang="ja" lang="ja">日本語</button>
@@ -60,37 +60,37 @@
   </header>
 
   <!-- Story timeline rail -->
-  <aside class="timeline" id="timeline" aria-label="Story timeline">
+  <aside class="timeline" id="timeline" aria-label="Story timeline" data-i18n-aria="ariaTimeline">
     <div class="tl-track"><i id="tlFill"></i></div>
     <ol id="tlList"></ol>
   </aside>
 
   <!-- Hero (beat 0) -->
-  <section class="hero" aria-label="Introduction">
+  <section class="hero" aria-label="Introduction" data-i18n-aria="ariaIntro">
     <p class="eyebrow" data-i18n="eyebrow">Spreadwings · Engineering the Future of Defence</p>
     <h1 class="words" id="heroTitle"><span><i>From</i></span> <span><i>Vision</i></span><br><span><i>to</i></span> <span><i>Innovation.</i></span></h1>
   </section>
 
   <!-- Chapter card -->
   <div class="log hide" id="log" aria-live="polite">
-    <div class="log-head"><span id="logStamp">The Vision</span></div>
+    <div class="log-head"><span id="logStamp"></span></div>
     <h2 id="logTitle"></h2>
     <div class="log-body" id="logText"></div>
   </div>
 
   <!-- Part dossier (hover / tap a part). The zoom window is a hole the 3D canvas renders into. -->
-  <div class="dossier" id="dossier" role="dialog" aria-label="Part details">
-    <div class="d-zoom" id="dZoom"><span>LIVE ZOOM</span></div>
+  <div class="dossier" id="dossier" role="dialog" aria-label="Part details" data-i18n-aria="ariaPart">
+    <div class="d-zoom" id="dZoom"><span data-i18n="liveZoom">LIVE ZOOM</span></div>
     <div class="d-info">
-      <div class="d-id"><span id="dIdx">01</span><em id="dCode">ARROWHEAD</em></div>
-      <h3 id="dName">Nose fairing</h3>
+      <div class="d-id"><span id="dIdx"></span><em id="dCode"></em></div>
+      <h3 id="dName"></h3>
       <p id="dText"></p>
       <dl id="dStats"></dl>
     </div>
   </div>
 
   <!-- Parts index (also the touch-friendly way in) -->
-  <nav class="parts" id="parts" aria-label="Payload parts"></nav>
+  <nav class="parts" id="parts" aria-label="Payload parts" data-i18n-aria="ariaParts"></nav>
 
   <!-- Impact flash + shockwave -->
   <div class="flash" id="flash" aria-hidden="true"></div>
@@ -125,15 +125,40 @@
   <script>
     // boot sequence runs on its own, so a slow or failing 3D load never leaves the page stuck
     (function () {
-      var lines = [
-        'SPREADWINGS // <b>ENGINEERING THE FUTURE OF DEFENCE</b>',
-        '> airframe EG-50 ............. <b>NOMINAL</b>',
-        '> payload .................... <b>ON PYLON</b>',
-        '> scan head .................. <b>STANDBY</b>',
-        '> altitude ................... <b>18 000 m</b>',
-        '> chapters ................... <b>06</b>',
-        '> from vision to impact ...... <b>●</b>'
-      ];
+      var BOOT = {
+        en: [
+          'SPREADWINGS // <b>ENGINEERING THE FUTURE OF DEFENCE</b>',
+          '> airframe EG-50 ............. <b>NOMINAL</b>',
+          '> payload .................... <b>ON PYLON</b>',
+          '> scan head .................. <b>STANDBY</b>',
+          '> altitude ................... <b>18 000 m</b>',
+          '> chapters ................... <b>06</b>',
+          '> from vision to impact ...... <b>●</b>'
+        ],
+        zh: [
+          'SPREADWINGS // <b>以工程塑造国防的未来</b>',
+          '> 机体 EG-50 ......... <b>正常</b>',
+          '> 载荷 ............... <b>已挂载</b>',
+          '> 扫描头 ............. <b>待命</b>',
+          '> 高度 ............... <b>18 000 米</b>',
+          '> 章节 ............... <b>06</b>',
+          '> 从愿景到影响力 ..... <b>●</b>'
+        ],
+        ja: [
+          'SPREADWINGS // <b>防衛の未来をエンジニアリングする</b>',
+          '> 機体 EG-50 ......... <b>正常</b>',
+          '> ペイロード ......... <b>搭載済み</b>',
+          '> スキャンヘッド ..... <b>待機</b>',
+          '> 高度 ............... <b>18 000 m</b>',
+          '> チャプター ......... <b>06</b>',
+          '> ビジョンからインパクトへ <b>●</b>'
+        ]
+      };
+      var code = new URLSearchParams(location.search).get('lang');
+      if (!BOOT[code]) { try { code = localStorage.getItem('sw-lang'); } catch (e) { code = null; } }
+      if (!BOOT[code]) { var nl = (navigator.language || 'en').toLowerCase(); code = nl.indexOf('zh') === 0 ? 'zh' : nl.indexOf('ja') === 0 ? 'ja' : 'en'; }
+      document.documentElement.lang = { en: 'en', zh: 'zh-Hans', ja: 'ja' }[code];
+      var lines = BOOT[code];
       var fast = matchMedia('(prefers-reduced-motion: reduce)').matches;
       var log = document.getElementById('bootLog'), bar = document.getElementById('bootBar'), n = 0;
       // lines tick in while the 3D scene warms up; the screen lifts as soon as it is ready (8 s cap)
@@ -151,6 +176,6 @@
       }, fast ? 30 : 110);
     })();
   </script>
-  <script type="module" src="drop.js?v=11"></script>
+  <script type="module" src="drop.js?v=13"></script>
 </body>
 </html>

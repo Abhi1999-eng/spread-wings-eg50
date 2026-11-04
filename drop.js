@@ -5,7 +5,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import Lenis from 'lenis';
-import { L10N, LANGS } from './drop-i18n.js?v=11';
+import { L10N, LANGS } from './drop-i18n.js?v=13';
 
 /* =========================================================
    Helpers
@@ -47,8 +47,7 @@ const BEATS = [null, { n: 1 }, { n: 2 }, { n: 3 }, { n: 4, href: 'index.html' },
 const chapter = (b) => T().ch[b.n - 1];
 
 // Part dossiers (illustrative concept payload)
-const CODES = { nose: 'ARROWHEAD', sensor: 'WHISPER', telemetry: 'LANTERN', power: 'EMBER', core: 'CLASSIFIED', cradle: 'SPINE', shell: 'SHELL', tail: 'FEATHERS', lug: 'TALON' };
-const info = (k) => { const [name, text, stats] = T().parts[k]; return { code: CODES[k], name, text, stats }; };
+const info = (k) => { const [name, text, stats] = T().parts[k]; return { code: T().codes[k], name, text, stats }; };
 const PART_ORDER = ['nose', 'sensor', 'telemetry', 'power', 'core', 'cradle', 'shell', 'tail', 'lug'];
 
 function rand(seed) {
@@ -818,7 +817,7 @@ PART_ORDER.forEach((k) => {
   const t = document.createElement('div');
   t.className = `tag ${TAG_ROW[k] > 0 ? 'up' : 'down'}`;
   t.style.setProperty('--len', `${Math.abs(TAG_ROW[k])}px`);
-  t.innerHTML = `<span><em>${n}</em>${CODES[k]}</span>`;
+  t.innerHTML = `<span><em>${n}</em><b></b></span>`;
   t.addEventListener('pointerenter', () => setHover(k));
   t.addEventListener('pointerleave', () => setHover(null));
   t.addEventListener('click', () => togglePin(k));
@@ -895,6 +894,10 @@ function applyLang(code) {
   document.documentElement.lang = LANGS[code].html;
   document.title = t.title;
   document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t[el.dataset.i18n]; });
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', t[el.dataset.i18nAria]));
+  document.querySelector('meta[name="description"]').setAttribute('content', t.description);
+  Object.entries(tags).forEach(([k, el]) => { el.querySelector('b').textContent = t.codes[k]; });
+  const sc = $('hScan'); sc._v = sc.textContent = t.scanOff;   // the render loop takes over from here
   $('heroTitle').innerHTML = words(t.hero);
   $('finaleTitle').innerHTML = words(t.finale);
   BEATS.filter(Boolean).forEach((b, i) => { tlItems[i].querySelector('b').textContent = chapter(b).name; });
@@ -1257,7 +1260,8 @@ function tick() {
   showDossier(focusKey);
   document.body.classList.toggle('focusing', !!focusKey);
   partsNav.classList.toggle('on', sv > 2.6 && sv < 5.4);
-  setText(hud.scan, focusKey ? `FOCUS · ${CODES[focusKey]}` : scan > 0.5 ? 'SCAN · LIVE' : 'SCAN · OFF');
+  const tr = L10N[lang];   // (tick has its own `T`: mission time)
+  setText(hud.scan, focusKey ? `${tr.focus} · ${tr.codes[focusKey]}` : scan > 0.5 ? tr.scanLive : tr.scanOff);
   hud.scan.classList.toggle('on', !focusKey && scan > 0.5);
   hud.scan.classList.toggle('lock', !!focusKey);
 

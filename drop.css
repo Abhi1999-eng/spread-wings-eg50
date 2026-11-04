@@ -113,7 +113,7 @@ body.dragging #stage { cursor: grabbing; }
 :root:lang(ja) h1, :root:lang(ja) h2, :root:lang(ja) h3, :root:lang(ja) .log-body p, :root:lang(ja) .dossier p { word-break: auto-phrase; }
 :root:lang(zh-Hans) .log-body p, :root:lang(ja) .log-body p { line-height: 1.75; letter-spacing: .02em; }
 :root:lang(zh-Hans) .log h2, :root:lang(ja) .log h2 { line-height: 1.35; letter-spacing: 0; }
-:root:lang(zh-Hans) .eyebrow, :root:lang(ja) .eyebrow, :root:lang(zh-Hans) .op, :root:lang(ja) .op, :root:lang(zh-Hans) .log-head, :root:lang(ja) .log-head { letter-spacing: .12em; font-family: inherit; }
+:root:lang(zh-Hans) .boot pre, :root:lang(ja) .boot pre, :root:lang(zh-Hans) .hud, :root:lang(ja) .hud, :root:lang(zh-Hans) .tag, :root:lang(ja) .tag, :root:lang(zh-Hans) .d-id, :root:lang(ja) .d-id, :root:lang(zh-Hans) .d-zoom span, :root:lang(ja) .d-zoom span, :root:lang(zh-Hans) .eyebrow, :root:lang(ja) .eyebrow, :root:lang(zh-Hans) .op, :root:lang(ja) .op, :root:lang(zh-Hans) .log-head, :root:lang(ja) .log-head { letter-spacing: .12em; font-family: inherit; }
 :root:lang(zh-Hans) .caps li, :root:lang(ja) .caps li, :root:lang(zh-Hans) .cue, :root:lang(ja) .cue, :root:lang(zh-Hans) .replay, :root:lang(ja) .replay, :root:lang(zh-Hans) .disclaimer, :root:lang(ja) .disclaimer, :root:lang(zh-Hans) .parts .hint, :root:lang(ja) .parts .hint { font-family: inherit; letter-spacing: .06em; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -356,3 +356,4 @@ body.outro-on .log, body.outro-on .timeline { opacity: 0; pointer-events: none; 
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
+.tag b { font-weight: inherit; }

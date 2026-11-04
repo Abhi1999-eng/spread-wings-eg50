@@ -3,6 +3,7 @@
 //
 // Headlines are lists of word chunks that animate in one by one; '|' is a line break.
 // Each part entry is [name, description, [[label, value] x3]].
+// The boot screen's lines live in drop.html, since they show before this module loads.
 
 export const LANGS = {
   en: { html: 'en', label: 'EN' },
@@ -12,6 +13,11 @@ export const LANGS = {
 
 export const L10N = {
   en: {
+    description: 'Spreadwings: engineering the future of defence. From vision to innovation, from engineering to impact.',
+    hudAlt: 'ALT', hudVel: 'VEL', hudTime: 'T', unitM: 'm', unitMs: 'm/s',
+    scanOff: 'SCAN · OFF', scanLive: 'SCAN · LIVE', focus: 'FOCUS', liveZoom: 'LIVE ZOOM',
+    ariaLang: 'Language', ariaTimeline: 'Story timeline', ariaIntro: 'Introduction', ariaPart: 'Part details', ariaParts: 'Payload parts',
+    codes: { nose: 'ARROWHEAD', sensor: 'WHISPER', telemetry: 'LANTERN', power: 'EMBER', core: 'CLASSIFIED', cradle: 'SPINE', shell: 'SHELL', tail: 'FEATHERS', lug: 'TALON' },
     title: 'Spreadwings | From Vision to Impact',
     op: 'FROM VISION TO IMPACT',
     eyebrow: 'Spreadwings · Engineering the Future of Defence',
@@ -68,6 +74,11 @@ export const L10N = {
   },
 
   zh: {
+    description: 'Spreadwings：以工程塑造国防的未来。从愿景到创新，从工程到影响力。',
+    hudAlt: '高度', hudVel: '速度', hudTime: '时间', unitM: '米', unitMs: '米/秒',
+    scanOff: '扫描 · 关闭', scanLive: '扫描 · 实时', focus: '聚焦', liveZoom: '实时放大',
+    ariaLang: '语言', ariaTimeline: '故事时间线', ariaIntro: '简介', ariaPart: '部件详情', ariaParts: '载荷部件',
+    codes: { nose: '箭头', sensor: '低语', telemetry: '灯笼', power: '余烬', core: '机密', cradle: '脊梁', shell: '甲壳', tail: '羽翼', lug: '利爪' },
     title: 'Spreadwings | 从愿景到影响力',
     op: '从愿景到影响力',
     eyebrow: 'Spreadwings · 以工程塑造国防的未来',
@@ -124,6 +135,11 @@ export const L10N = {
   },
 
   ja: {
+    description: 'Spreadwings：防衛の未来をエンジニアリングする。ビジョンからイノベーションへ、エンジニアリングからインパクトへ。',
+    hudAlt: '高度', hudVel: '速度', hudTime: '時間', unitM: 'm', unitMs: 'm/s',
+    scanOff: 'スキャン · オフ', scanLive: 'スキャン · ライブ', focus: 'フォーカス', liveZoom: 'ライブズーム',
+    ariaLang: '言語', ariaTimeline: 'ストーリーのタイムライン', ariaIntro: 'イントロダクション', ariaPart: 'パーツの詳細', ariaParts: 'ペイロードのパーツ',
+    codes: { nose: 'アローヘッド', sensor: 'ウィスパー', telemetry: 'ランタン', power: 'エンバー', core: '機密', cradle: 'スパイン', shell: 'シェル', tail: 'フェザー', lug: 'タロン' },
     title: 'Spreadwings | ビジョンからインパクトへ',
     op: 'ビジョンからインパクトへ',
     eyebrow: 'Spreadwings · 防衛の未来をエンジニアリングする',
