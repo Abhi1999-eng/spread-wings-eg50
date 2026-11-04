@@ -5,6 +5,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import Lenis from 'lenis';
+import { L10N, LANGS } from './drop-i18n.js?v=11';
 
 /* =========================================================
    Helpers
@@ -28,70 +29,26 @@ const FALL_SECONDS = 92;
 /* =========================================================
    Story (fictional)
    ========================================================= */
+/* =========================================================
+   Language
+   ========================================================= */
+function pickLang() {
+  const q = new URLSearchParams(location.search).get('lang');
+  if (q && L10N[q]) return q;
+  try { const saved = localStorage.getItem('sw-lang'); if (saved && L10N[saved]) return saved; } catch (e) { /* storage blocked */ }
+  const nav = (navigator.language || 'en').toLowerCase();
+  return nav.startsWith('zh') ? 'zh' : nav.startsWith('ja') ? 'ja' : 'en';
+}
+let lang = pickLang();
+const T = () => L10N[lang];
+
 // Client story: one chapter per scroll beat. Beat 0 is the hero, beat 7 the finale.
-const BEATS = [
-  null,
-  { n: 1, name: 'The Vision', mega: 'Vision', title: 'Every great advancement begins with a question.', body: [
-    'What if technology could help nations see further, respond smarter and prepare for the challenges of tomorrow?',
-    'The vision was simple: to push the boundaries of aerospace engineering and develop advanced technologies that address the evolving needs of modern defence.',
-    'We believed that the future would belong to those who dared to innovate.',
-    'And that belief became the beginning of our journey.'] },
-  { n: 2, name: 'The Foundation', mega: 'Foundation', title: 'From an idea to an engineering vision.', body: [
-    'What began as an ambition gradually took shape through research, engineering and a commitment to technological excellence.',
-    'Our focus was to bring together innovation, precision and purposeful engineering under one vision.',
-    'Every concept represented a possibility. Every prototype represented progress. Every challenge became an opportunity to rethink what was possible.',
-    'We were not just building technology. We were building the foundation for what comes next.'] },
-  { n: 3, name: 'The Evolution', mega: 'Evolution', title: 'Progress is not a destination. It is a continuous pursuit.', body: [
-    'As technology evolved, so did our ambitions.',
-    'Our journey expanded across multiple domains of aerospace and defence technology, exploring new possibilities in unmanned systems, advanced aerial platforms and defence solutions.',
-    'Through a culture of research, engineering and continuous improvement, our vision grew into a broader technological ecosystem.',
-    'One idea became many possibilities. One direction became a journey of innovation.'] },
-  { n: 4, name: 'The Capabilities', mega: 'Capabilities', title: 'Designed with purpose. Engineered for demanding environments.', body: [
-    'Today, our vision extends across a diverse portfolio of advanced aerospace and defence technologies.',
-    'Every product represents a commitment to engineering excellence, reliability and mission-oriented innovation.'],
-    list: ['Unmanned Aerial Systems', 'Advanced Drone Platforms', 'Missile Systems', 'Aerospace Engineering', 'Integrated Defence Technologies'],
-    cta: ['Explore Our Products', 'index.html'] },
-  { n: 5, name: 'The Purpose', mega: 'Purpose', title: 'Technology has a greater purpose.', body: [
-    'In an increasingly complex world, technological advancement plays a critical role in strengthening national capabilities.',
-    'We believe that meaningful innovation comes from understanding real-world requirements, engineering with precision and building solutions with long-term purpose.',
-    'Our focus goes beyond developing individual products. It is about contributing to a stronger, more technologically capable future.'] },
-  { n: 6, name: 'The Future', mega: 'Future', title: 'We are only getting started.', body: [
-    'The future of aerospace and defence will be shaped by those who continue to question limitations and explore new possibilities.',
-    'At Spreadwings, we see every challenge as an opportunity to advance.',
-    'Our journey continues with a commitment to innovation, engineering excellence and technologies that shape tomorrow.'] },
-  null,
-];
+const BEATS = [null, { n: 1 }, { n: 2 }, { n: 3 }, { n: 4, href: 'index.html' }, { n: 5 }, { n: 6 }, null];
+const chapter = (b) => T().ch[b.n - 1];
 
 // Part dossiers (illustrative concept payload)
-const INFO = {
-  nose: { code: 'ARROWHEAD', name: 'Nose fairing',
-    text: 'Ceramic-composite nose cone. It meets the air first, takes the heat, and keeps the forward sensor window clean all the way down.',
-    stats: [['Material', 'Ceramic'], ['Mass', '6.2 kg'], ['Skin temp', '410 °C']] },
-  sensor: { code: 'WHISPER', name: 'Ground-sense ring',
-    text: 'Six small radar heads in a ring. They read height above ground and stream it up to the EG-50 for the record.',
-    stats: [['Heads', '6'], ['Update', '200 Hz'], ['Range', '3 km']] },
-  telemetry: { code: 'LANTERN', name: 'Telemetry bay',
-    text: 'The payload’s voice. Spin, attitude, temperature and position, sent to the EG-50 forty times a second.',
-    stats: [['Link', 'Encrypted'], ['Rate', '40 Hz'], ['Channels', '12']] },
-  power: { code: 'EMBER', name: 'Power cell stack',
-    text: 'Seven cells that keep every sensor alive for the fall, and not a second longer.',
-    stats: [['Cells', '7'], ['Runtime', '240 s'], ['Bus', '28 V']] },
-  core: { code: 'CLASSIFIED', name: 'Sealed core',
-    text: 'Sealed vessel at the heart of the payload. The scan shows its outline and nothing else. Even this page does not know what is inside.',
-    stats: [['Access', 'None'], ['Clearance', 'L-5'], ['Contents', '████']] },
-  cradle: { code: 'SPINE', name: 'Shock cradle',
-    text: 'Three titanium rails and two rings that hold every module in line through release, spin and buffeting.',
-    stats: [['Rails', '3'], ['Material', 'Ti-6Al'], ['Rated', '40 g']] },
-  shell: { code: 'SHELL', name: 'Outer casing',
-    text: 'Two-piece steel-composite casing. In the scan it opens like a book. In reality it never opens at all.',
-    stats: [['Pieces', '2'], ['Length', '3.2 m'], ['Finish', 'Matte']] },
-  tail: { code: 'FEATHERS', name: 'Tail fin assembly',
-    text: 'Four fins and a box ring. They keep the payload nose-down and give it a slow, steady spin.',
-    stats: [['Fins', '4'], ['Spin', '1.5 rev/s'], ['Ring', 'Ø 1.2 m']] },
-  lug: { code: 'TALON', name: 'Release lug',
-    text: 'The single hook that holds the payload to the EG-50’s pylon. Opened at T+00:00 and never used again.',
-    stats: [['Rated', '50 kg'], ['Opened', 'T+00:00'], ['Reuse', 'None']] },
-};
+const CODES = { nose: 'ARROWHEAD', sensor: 'WHISPER', telemetry: 'LANTERN', power: 'EMBER', core: 'CLASSIFIED', cradle: 'SPINE', shell: 'SHELL', tail: 'FEATHERS', lug: 'TALON' };
+const info = (k) => { const [name, text, stats] = T().parts[k]; return { code: CODES[k], name, text, stats }; };
 const PART_ORDER = ['nose', 'sensor', 'telemetry', 'power', 'core', 'cradle', 'shell', 'tail', 'lug'];
 
 function rand(seed) {
@@ -841,7 +798,7 @@ BEATS.forEach((b, i) => {
   if (!b) return;
   const li = document.createElement('li');
   li.tabIndex = 0;
-  li.innerHTML = `${String(b.n).padStart(2, '0')}<b>${b.name}</b>`;
+  li.innerHTML = `${String(b.n).padStart(2, '0')}<b></b>`;
   const go = () => scrollToBeat(i + 0.05);
   li.addEventListener('click', go);
   li.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
@@ -854,14 +811,14 @@ const TAG_ROW = { tail: 78, cradle: -78, core: 124, power: -124, telemetry: 78, 
 const tagsEl = $('tags');
 const tags = {};
 const partsNav = $('parts');
-partsNav.innerHTML = '<div class="hint">HOVER ANY PART · OR PICK ONE</div>';
+partsNav.innerHTML = '<div class="hint" data-i18n="partsHint"></div>';
 PART_ORDER.forEach((k) => {
   const p = parts[k];
   const n = String(p.idx).padStart(2, '0');
   const t = document.createElement('div');
   t.className = `tag ${TAG_ROW[k] > 0 ? 'up' : 'down'}`;
   t.style.setProperty('--len', `${Math.abs(TAG_ROW[k])}px`);
-  t.innerHTML = `<span><em>${n}</em>${INFO[k].code}</span>`;
+  t.innerHTML = `<span><em>${n}</em>${CODES[k]}</span>`;
   t.addEventListener('pointerenter', () => setHover(k));
   t.addEventListener('pointerleave', () => setHover(null));
   t.addEventListener('click', () => togglePin(k));
@@ -871,8 +828,6 @@ PART_ORDER.forEach((k) => {
   const b = document.createElement('button');
   b.type = 'button';
   b.textContent = n;
-  b.title = INFO[k].name;
-  b.setAttribute('aria-label', `${INFO[k].name}, ${INFO[k].code}`);
   b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') setHover(k); });
   b.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') setHover(null); });
   b.addEventListener('focus', () => setHover(k));
@@ -894,12 +849,12 @@ function showDossier(k) {
   partButtons.forEach((b) => b.classList.toggle('active', b.dataset.key === k));
   Object.entries(tags).forEach(([kk, t]) => t.classList.toggle('active', kk === k));
   if (!k) return;
-  const info = INFO[k];
+  const inf = info(k);
   $('dIdx').textContent = `${String(parts[k].idx).padStart(2, '0')} / 09`;
-  $('dCode').textContent = info.code;
-  $('dName').textContent = info.name;
-  $('dText').textContent = info.text;
-  $('dStats').innerHTML = info.stats.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('');
+  $('dCode').textContent = inf.code;
+  $('dName').textContent = inf.name;
+  $('dText').textContent = inf.text;
+  $('dStats').innerHTML = inf.stats.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('');
 }
 
 let hoverPart = null, pinnedPart = null;
@@ -916,21 +871,46 @@ function showBeat(i) {
   document.body.classList.toggle('hero-on', i === 0);
   log.classList.toggle('hide', !b);
   tlItems.forEach((li, n) => { li.classList.toggle('now', n === i - 1); li.classList.toggle('past', n < i - 1); });
-  buildMega(b ? b.mega : '');
+  const c = b && chapter(b);
+  buildMega(c ? c.mega : '');
   if (!b) return;
-  logStamp.textContent = b.name;
-  logTitle.textContent = b.title;
+  logStamp.textContent = c.name;
+  logTitle.textContent = c.title;
   let k = 0;
   const line = (html) => `<span class="ln" style="--d:${(0.12 + 0.09 * k++).toFixed(2)}s">${html}</span>`;
   logText.innerHTML =
-    b.body.slice(0, b.list ? 1 : 99).map((t) => `<p>${line(t)}</p>`).join('') +
-    (b.list ? `<ul class="caps">${b.list.map((t) => `<li>${line(t)}</li>`).join('')}</ul>` : '') +
-    (b.list ? b.body.slice(1).map((t) => `<p>${line(t)}</p>`).join('') : '') +
-    (b.cta ? `<a class="btn btn-sm log-cta" href="${b.cta[1]}">${line(b.cta[0] + ' →')}</a>` : '');
+    c.body.slice(0, c.list ? 1 : 99).map((t) => `<p>${line(t)}</p>`).join('') +
+    (c.list ? `<ul class="caps">${c.list.map((t) => `<li>${line(t)}</li>`).join('')}</ul>` : '') +
+    (c.list ? c.body.slice(1).map((t) => `<p>${line(t)}</p>`).join('') : '') +
+    (c.cta ? `<a class="btn btn-sm log-cta" href="${b.href}">${line(c.cta + ' →')}</a>` : '');
   log.classList.remove('in');
   void log.offsetWidth;
   log.classList.add('in');
 }
+// swap every piece of copy to the chosen language, in place
+const words = (chunks) => chunks.map((w) => (w === '|' ? '<br>' : `<span><i>${w}</i></span>`)).join(' ');
+function applyLang(code) {
+  lang = code;
+  const t = T();
+  document.documentElement.lang = LANGS[code].html;
+  document.title = t.title;
+  document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t[el.dataset.i18n]; });
+  $('heroTitle').innerHTML = words(t.hero);
+  $('finaleTitle').innerHTML = words(t.finale);
+  BEATS.filter(Boolean).forEach((b, i) => { tlItems[i].querySelector('b').textContent = chapter(b).name; });
+  partButtons.forEach((btn) => {
+    const inf = info(btn.dataset.key);
+    btn.title = inf.name;
+    btn.setAttribute('aria-label', `${inf.name}, ${inf.code}`);
+  });
+  document.querySelectorAll('.lang button').forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.lang === code)));
+  const beat = shownBeat; shownBeat = -1; if (beat >= 0) showBeat(beat);
+  const part = shownPart; shownPart = undefined; showDossier(part);
+  try { localStorage.setItem('sw-lang', code); } catch (e) { /* storage blocked */ }
+}
+document.querySelectorAll('.lang button').forEach((btn) => btn.addEventListener('click', () => applyLang(btn.dataset.lang)));
+applyLang(lang);
+
 // write text only when it changes
 const setText = (el, v) => { if (el._v !== v) { el._v = v; el.textContent = v; } };
 
@@ -1277,7 +1257,7 @@ function tick() {
   showDossier(focusKey);
   document.body.classList.toggle('focusing', !!focusKey);
   partsNav.classList.toggle('on', sv > 2.6 && sv < 5.4);
-  setText(hud.scan, focusKey ? `FOCUS · ${INFO[focusKey].code}` : scan > 0.5 ? 'SCAN · LIVE' : 'SCAN · OFF');
+  setText(hud.scan, focusKey ? `FOCUS · ${CODES[focusKey]}` : scan > 0.5 ? 'SCAN · LIVE' : 'SCAN · OFF');
   hud.scan.classList.toggle('on', !focusKey && scan > 0.5);
   hud.scan.classList.toggle('lock', !!focusKey);
 

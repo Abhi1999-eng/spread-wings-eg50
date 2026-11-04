@@ -95,6 +95,26 @@ body.dragging #stage { cursor: grabbing; }
 .brand svg { width: 30px; fill: var(--red); }
 .brand em { font-style: normal; color: var(--steel); margin-left: 4px; }
 .op { font: 11px var(--mono); letter-spacing: .3em; color: var(--steel); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.lang { display: flex; border: 1px solid var(--line); background: var(--glass); border-radius: 3px; overflow: hidden; }
+.lang button { padding: 7px 10px; font: 500 12px var(--font); color: var(--steel); letter-spacing: .02em; transition: color .2s, background .2s; }
+.lang button + button { border-left: 1px solid var(--line); }
+.lang button:hover { color: var(--ink); }
+.lang button[aria-pressed="true"] { color: #fff; background: rgba(224,49,59,.85); }
+.lang button:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; }
+
+/* CJK: system fonts carry the glyphs; drop the tight Latin tracking */
+:root:lang(zh-Hans) body { font-family: "Space Grotesk", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+:root:lang(ja) body { font-family: "Space Grotesk", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif; }
+:root:lang(zh-Hans) .hero h1, :root:lang(zh-Hans) .outro h1, :root:lang(ja) .hero h1, :root:lang(ja) .outro h1 { letter-spacing: 0; line-height: 1.12; font-weight: 700; }
+:root:lang(ja) .hero h1, :root:lang(ja) .outro h1 { font-size: clamp(32px, 6vw, 92px); }
+:root:lang(zh-Hans) .mega, :root:lang(ja) .mega { letter-spacing: .02em; }
+/* Japanese: break at phrase boundaries, never inside a word */
+:root:lang(ja) h1, :root:lang(ja) h2, :root:lang(ja) h3, :root:lang(ja) .log-body p, :root:lang(ja) .dossier p { word-break: auto-phrase; }
+:root:lang(zh-Hans) .log-body p, :root:lang(ja) .log-body p { line-height: 1.75; letter-spacing: .02em; }
+:root:lang(zh-Hans) .log h2, :root:lang(ja) .log h2 { line-height: 1.35; letter-spacing: 0; }
+:root:lang(zh-Hans) .eyebrow, :root:lang(ja) .eyebrow, :root:lang(zh-Hans) .op, :root:lang(ja) .op, :root:lang(zh-Hans) .log-head, :root:lang(ja) .log-head { letter-spacing: .12em; font-family: inherit; }
+:root:lang(zh-Hans) .caps li, :root:lang(ja) .caps li, :root:lang(zh-Hans) .cue, :root:lang(ja) .cue, :root:lang(zh-Hans) .replay, :root:lang(ja) .replay, :root:lang(zh-Hans) .disclaimer, :root:lang(ja) .disclaimer, :root:lang(zh-Hans) .parts .hint, :root:lang(ja) .parts .hint { font-family: inherit; letter-spacing: .06em; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 13px 22px; border-radius: 3px;
@@ -292,6 +312,7 @@ body.outro-on .log, body.outro-on .timeline { opacity: 0; pointer-events: none; 
 /* ---------- Small screens ---------- */
 @media (max-width: 900px) {
   .op { display: none; }
+  .lang button { padding: 7px 8px; font-size: 11px; }
   .timeline { top: 128px; transform: none; }
   .timeline ol { gap: 8px; }
   .timeline li { font-size: 0; }
@@ -319,6 +340,7 @@ body.outro-on .log, body.outro-on .timeline { opacity: 0; pointer-events: none; 
   .tag::after { display: none; }
 }
 @media (max-width: 560px) {
+  .nav-eg { display: none; }
   .hud-top span:nth-child(3) { display: none; }
 }
 

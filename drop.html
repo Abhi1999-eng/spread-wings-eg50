@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js" crossorigin>
-  <link rel="stylesheet" href="drop.css?v=10">
+  <link rel="stylesheet" href="drop.css?v=11">
 </head>
 <body>
   <!-- Boot sequence -->
@@ -48,8 +48,15 @@
       <svg viewBox="0 0 120 60" aria-hidden="true"><path d="M60 4 L114 54 L60 44 L6 54 Z"/></svg>
       <span>SPREAD<em>WINGS</em></span>
     </a>
-    <span class="op">FROM VISION TO IMPACT</span>
-    <a href="index.html" class="btn btn-sm">EG-50</a>
+    <span class="op" data-i18n="op">FROM VISION TO IMPACT</span>
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" lang="en">EN</button>
+        <button type="button" data-lang="zh" lang="zh-Hans">中文</button>
+        <button type="button" data-lang="ja" lang="ja">日本語</button>
+      </div>
+      <a href="index.html" class="btn btn-sm nav-eg">EG-50</a>
+    </div>
   </header>
 
   <!-- Story timeline rail -->
@@ -60,8 +67,8 @@
 
   <!-- Hero (beat 0) -->
   <section class="hero" aria-label="Introduction">
-    <p class="eyebrow">Spreadwings · Engineering the Future of Defence</p>
-    <h1 class="words"><span><i>From</i></span> <span><i>Vision</i></span><br><span><i>to</i></span> <span><i>Innovation.</i></span></h1>
+    <p class="eyebrow" data-i18n="eyebrow">Spreadwings · Engineering the Future of Defence</p>
+    <h1 class="words" id="heroTitle"><span><i>From</i></span> <span><i>Vision</i></span><br><span><i>to</i></span> <span><i>Innovation.</i></span></h1>
   </section>
 
   <!-- Chapter card -->
@@ -90,14 +97,14 @@
 
   <!-- Epilogue -->
   <section class="outro" id="outro">
-    <h1 class="words"><span><i>From</i></span> <span><i>Engineering</i></span><br><span><i>to</i></span> <span><i>Impact.</i></span></h1>
-    <p class="wordmark"><b>SPREADWINGS</b><span>Engineering Beyond Boundaries.</span></p>
+    <h1 class="words" id="finaleTitle"><span><i>From</i></span> <span><i>Engineering</i></span><br><span><i>to</i></span> <span><i>Impact.</i></span></h1>
+    <p class="wordmark"><b>SPREADWINGS</b><span data-i18n="tagline">Engineering Beyond Boundaries.</span></p>
     <div class="outro-cta">
-      <a class="btn" href="index.html#specs">Discover Our Capabilities</a>
-      <a class="btn ghost" href="index.html#contact">Connect With Our Team</a>
+      <a class="btn" href="index.html#specs" data-i18n="ctaCapabilities">Discover Our Capabilities</a>
+      <a class="btn ghost" href="index.html#contact" data-i18n="ctaTeam">Connect With Our Team</a>
     </div>
-    <button class="replay" id="replay" type="button">↺ Replay the story</button>
-    <small class="disclaimer">Cinematic concept visualisation. The payload shown is illustrative. Aerial footage: Pexels.</small>
+    <button class="replay" id="replay" type="button" data-i18n="replay">↺ Replay the story</button>
+    <small class="disclaimer" data-i18n="disclaimer">Cinematic concept visualisation. The payload shown is illustrative. Aerial footage: Pexels.</small>
   </section>
 
   <!-- Scroll length: each block is one beat of the story -->
@@ -106,7 +113,7 @@
     <section></section><section></section><section></section><section></section>
   </main>
 
-  <div class="cue" id="cue">Scroll to begin <i></i></div>
+  <div class="cue" id="cue"><span data-i18n="cue">Scroll to begin</span> <i></i></div>
 
   <script type="importmap">
     { "imports": {
@@ -144,6 +151,6 @@
       }, fast ? 30 : 110);
     })();
   </script>
-  <script type="module" src="drop.js?v=10"></script>
+  <script type="module" src="drop.js?v=11"></script>
 </body>
 </html>
