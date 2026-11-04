@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spread Wings | Operation Sundown</title>
-  <meta name="description" content="Operation Sundown: a fictional cinematic story. One EG-50, one payload, ninety-two seconds of fall, scanned live all the way down.">
+  <title>Spreadwings | From Vision to Impact</title>
+  <meta name="description" content="Spreadwings: engineering the future of defence. From vision to innovation, from engineering to impact.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="drop.css?v=6">
+  <link rel="stylesheet" href="drop.css?v=7">
 </head>
 <body>
   <!-- Boot sequence -->
@@ -47,7 +47,7 @@
       <svg viewBox="0 0 120 60" aria-hidden="true"><path d="M60 4 L114 54 L60 44 L6 54 Z"/></svg>
       <span>SPREAD<em>WINGS</em></span>
     </a>
-    <span class="op">OPERATION SUNDOWN</span>
+    <span class="op">FROM VISION TO IMPACT</span>
     <a href="index.html" class="btn btn-sm">EG-50</a>
   </header>
 
@@ -57,11 +57,17 @@
     <ol id="tlList"></ol>
   </aside>
 
-  <!-- Story log card -->
-  <div class="log" id="log" aria-live="polite">
-    <div class="log-head"><span id="logStamp">T−00:20</span><span id="logPlace">Stratosphere</span></div>
+  <!-- Hero (beat 0) -->
+  <section class="hero" aria-label="Introduction">
+    <p class="eyebrow">Spreadwings · Engineering the Future of Defence</p>
+    <h1 class="words"><span><i>From</i></span> <span><i>Vision</i></span><br><span><i>to</i></span> <span><i>Innovation.</i></span></h1>
+  </section>
+
+  <!-- Chapter card -->
+  <div class="log hide" id="log" aria-live="polite">
+    <div class="log-head"><span id="logStamp">Chapter 01</span><span id="logPlace">The Vision</span></div>
     <h2 id="logTitle"></h2>
-    <p id="logText"></p>
+    <div class="log-body" id="logText"></div>
   </div>
 
   <!-- Part dossier (hover / tap a part). The zoom window is a hole the 3D canvas renders into. -->
@@ -83,14 +89,14 @@
 
   <!-- Epilogue -->
   <section class="outro" id="outro">
-    <p class="eyebrow">T+01:32 · Ground zero</p>
-    <h1 id="outroTitle">SPREAD WINGS</h1>
-    <p class="lead">Ninety-two seconds. Eighteen kilometres. Every bolt of it seen, scanned and sent home by one aircraft.</p>
+    <h1 class="words"><span><i>From</i></span> <span><i>Engineering</i></span><br><span><i>to</i></span> <span><i>Impact.</i></span></h1>
+    <p class="wordmark"><b>SPREADWINGS</b><span>Engineering Beyond Boundaries.</span></p>
     <div class="outro-cta">
-      <a class="btn" href="index.html">Meet the EG-50</a>
-      <button class="btn ghost" id="replay" type="button">Replay the drop</button>
+      <a class="btn" href="index.html#specs">Discover Our Capabilities</a>
+      <a class="btn ghost" href="index.html#contact">Connect With Our Team</a>
     </div>
-    <small class="disclaimer">Operation Sundown is a fictional cinematic concept. The payload, mission, places and people are imaginary. Aerial footage: Pexels.</small>
+    <button class="replay" id="replay" type="button">↺ Replay the story</button>
+    <small class="disclaimer">Cinematic concept visualisation. The payload shown is illustrative. Aerial footage: Pexels.</small>
   </section>
 
   <!-- Scroll length: each block is one beat of the story -->
@@ -99,7 +105,7 @@
     <section></section><section></section><section></section><section></section>
   </main>
 
-  <div class="cue" id="cue">Scroll to release <i></i></div>
+  <div class="cue" id="cue">Scroll to begin <i></i></div>
 
   <script type="importmap">
     { "imports": {
@@ -112,13 +118,13 @@
     // boot sequence runs on its own, so a slow or failing 3D load never leaves the page stuck
     (function () {
       var lines = [
-        'SPREAD WINGS // GROUND STATION <b>NEST</b>',
-        '> link KESTREL-07 ............ <b>OK</b>',
-        '> airframe EG-50/HX .......... <b>NOMINAL</b>',
-        '> payload SUNDOWN ............ <b>ON PYLON</b>',
+        'SPREADWINGS // <b>ENGINEERING THE FUTURE OF DEFENCE</b>',
+        '> airframe EG-50 ............. <b>NOMINAL</b>',
+        '> payload .................... <b>ON PYLON</b>',
         '> scan head .................. <b>STANDBY</b>',
         '> altitude ................... <b>18 000 m</b>',
-        '> recording .................. <b>●</b>'
+        '> chapters ................... <b>06</b>',
+        '> from vision to impact ...... <b>●</b>'
       ];
       var fast = matchMedia('(prefers-reduced-motion: reduce)').matches;
       var log = document.getElementById('bootLog'), bar = document.getElementById('bootBar'), n = 0;
@@ -132,6 +138,6 @@
       }, fast ? 40 : 190);
     })();
   </script>
-  <script type="module" src="drop.js?v=6"></script>
+  <script type="module" src="drop.js?v=7"></script>
 </body>
 </html>

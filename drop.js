@@ -29,26 +29,41 @@ const FALL_SECONDS = 92;
 /* =========================================================
    Story (fictional)
    ========================================================= */
+// Client story: one chapter per scroll beat. Beat 0 is the hero, beat 7 the finale.
 const BEATS = [
-  { stamp: 'T−00:20', place: 'Stratosphere · 18.0 km', mega: 'Stratosphere', title: 'Kestrel-07 on station',
-    text: 'A stripped, high-altitude EG-50 holds station above the curve of the earth. Under its belly hangs SUNDOWN, a payload nobody on the ground has ever seen opened.' },
-  { stamp: 'T+00:08', place: 'Cloudline · 14.2 km', mega: 'Cloudline', title: 'Clean separation',
-    text: 'The release lug lets go. Kestrel-07 banks away and turns its sensor head onto the falling payload. From here on, it never looks away.' },
-  { stamp: 'T+00:24', place: 'High Himalaya · 10.6 km', mega: 'Himalaya', title: 'Scan mode: live',
-    text: 'The drone paints the payload in a live X-ray. On screen, the outer shell turns to glass. The teardown begins mid-air.' },
-  { stamp: 'T+00:41', place: 'Pine valley · 7.1 km', mega: 'Pine Valley', title: 'The autopsy',
-    text: 'Nine modules, pulled apart in the scan while the payload keeps falling. Hover any part to zoom in on it.' },
-  { stamp: 'T+00:57', place: 'Monsoon gorge · 4.4 km', mega: 'Monsoon', title: 'The core',
-    text: 'Inside the cradle sits the one module even the scan cannot see into. Ground station NEST names it SUNDOWN CORE and stops asking questions.' },
-  { stamp: 'T+01:13', place: 'Western coast · 2.0 km', mega: 'Coastline', title: 'Reassembly',
-    text: 'The scan folds every module back into place. The payload goes dark on screen again. Terminal phase.' },
-  { stamp: 'T+01:28', place: 'Kharsa Flats · 0.3 km', mega: 'Ground Zero', title: 'Four seconds',
-    text: 'The dunes go blue in the last light. Four seconds left. Kestrel-07 is already twelve kilometres away, still recording.' },
-  { stamp: 'T+01:32', place: 'Kharsa Flats · 0 m', mega: '', title: 'Sundown',
-    text: 'Impact. Shockwave. A column of fire climbs over the desert, and one aircraft sends home every second of it.' },
+  null,
+  { n: 1, name: 'The Vision', mega: 'Vision', title: 'Every great advancement begins with a question.', body: [
+    'What if technology could help nations see further, respond smarter and prepare for the challenges of tomorrow?',
+    'The vision was simple: to push the boundaries of aerospace engineering and develop advanced technologies that address the evolving needs of modern defence.',
+    'We believed that the future would belong to those who dared to innovate.',
+    'And that belief became the beginning of our journey.'] },
+  { n: 2, name: 'The Foundation', mega: 'Foundation', title: 'From an idea to an engineering vision.', body: [
+    'What began as an ambition gradually took shape through research, engineering and a commitment to technological excellence.',
+    'Our focus was to bring together innovation, precision and purposeful engineering under one vision.',
+    'Every concept represented a possibility. Every prototype represented progress. Every challenge became an opportunity to rethink what was possible.',
+    'We were not just building technology. We were building the foundation for what comes next.'] },
+  { n: 3, name: 'The Evolution', mega: 'Evolution', title: 'Progress is not a destination. It is a continuous pursuit.', body: [
+    'As technology evolved, so did our ambitions.',
+    'Our journey expanded across multiple domains of aerospace and defence technology, exploring new possibilities in unmanned systems, advanced aerial platforms and defence solutions.',
+    'Through a culture of research, engineering and continuous improvement, our vision grew into a broader technological ecosystem.',
+    'One idea became many possibilities. One direction became a journey of innovation.'] },
+  { n: 4, name: 'The Capabilities', mega: 'Capabilities', title: 'Designed with purpose. Engineered for demanding environments.', body: [
+    'Today, our vision extends across a diverse portfolio of advanced aerospace and defence technologies.',
+    'Every product represents a commitment to engineering excellence, reliability and mission-oriented innovation.'],
+    list: ['Unmanned Aerial Systems', 'Advanced Drone Platforms', 'Missile Systems', 'Aerospace Engineering', 'Integrated Defence Technologies'],
+    cta: ['Explore Our Products', 'index.html'] },
+  { n: 5, name: 'The Purpose', mega: 'Purpose', title: 'Technology has a greater purpose.', body: [
+    'In an increasingly complex world, technological advancement plays a critical role in strengthening national capabilities.',
+    'We believe that meaningful innovation comes from understanding real-world requirements, engineering with precision and building solutions with long-term purpose.',
+    'Our focus goes beyond developing individual products. It is about contributing to a stronger, more technologically capable future.'] },
+  { n: 6, name: 'The Future', mega: 'Future', title: 'We are only getting started.', body: [
+    'The future of aerospace and defence will be shaped by those who continue to question limitations and explore new possibilities.',
+    'At Spreadwings, we see every challenge as an opportunity to advance.',
+    'Our journey continues with a commitment to innovation, engineering excellence and technologies that shape tomorrow.'] },
+  null,
 ];
 
-// Part dossiers (fictional, cinematic)
+// Part dossiers (illustrative concept payload)
 const INFO = {
   nose: { code: 'ARROWHEAD', name: 'Nose fairing',
     text: 'Ceramic-composite nose cone. It meets the air first, takes the heat, and keeps the forward sensor window clean all the way down.',
@@ -57,12 +72,12 @@ const INFO = {
     text: 'Six small radar heads in a ring. They read height above ground and stream it up to the EG-50 for the record.',
     stats: [['Heads', '6'], ['Update', '200 Hz'], ['Range', '3 km']] },
   telemetry: { code: 'LANTERN', name: 'Telemetry bay',
-    text: 'The payload’s voice. Spin, attitude, temperature and position, sent to Kestrel-07 forty times a second.',
+    text: 'The payload’s voice. Spin, attitude, temperature and position, sent to the EG-50 forty times a second.',
     stats: [['Link', 'Encrypted'], ['Rate', '40 Hz'], ['Channels', '12']] },
   power: { code: 'EMBER', name: 'Power cell stack',
     text: 'Seven cells that keep every sensor alive for the fall, and not a second longer.',
     stats: [['Cells', '7'], ['Runtime', '240 s'], ['Bus', '28 V']] },
-  core: { code: 'CLASSIFIED', name: 'Sundown core',
+  core: { code: 'CLASSIFIED', name: 'Sealed core',
     text: 'Sealed vessel at the heart of the payload. The scan shows its outline and nothing else. Even this page does not know what is inside.',
     stats: [['Access', 'None'], ['Clearance', 'L-5'], ['Contents', '████']] },
   cradle: { code: 'SPINE', name: 'Shock cradle',
@@ -75,7 +90,7 @@ const INFO = {
     text: 'Four fins and a box ring. They keep the payload nose-down and give it a slow, steady spin.',
     stats: [['Fins', '4'], ['Spin', '1.5 rev/s'], ['Ring', 'Ø 1.2 m']] },
   lug: { code: 'TALON', name: 'Release lug',
-    text: 'The single hook that tied SUNDOWN to Kestrel-07’s pylon. Opened at T+00:00 and never used again.',
+    text: 'The single hook that holds the payload to the EG-50’s pylon. Opened at T+00:00 and never used again.',
     stats: [['Rated', '50 kg'], ['Opened', 'T+00:00'], ['Reuse', 'None']] },
 };
 const PART_ORDER = ['nose', 'sensor', 'telemetry', 'power', 'core', 'cradle', 'shell', 'tail', 'lug'];
@@ -374,10 +389,10 @@ function paintTex(withText) {
       g.fillStyle = 'rgba(226,218,180,.82)';
       g.font = '700 92px "JetBrains Mono", monospace';
       g.textAlign = 'center';
-      g.fillText('SUNDOWN', 0, 0);
+      g.fillText('SPREADWINGS', 0, 0);
       g.font = '500 30px "JetBrains Mono", monospace';
-      g.fillText('LOT 07  ·  SW-EG50/HX  ·  TRIAL ITEM', 0, 52);
-      g.fillText('DO NOT HANDLE WITHOUT NEST CLEARANCE', 0, 92);
+      g.fillText('SW-EG50/HX  ·  CONCEPT ITEM', 0, 52);
+      g.fillText('ENGINEERING BEYOND BOUNDARIES', 0, 92);
       g.restore();
       g.fillStyle = 'rgba(226,218,180,.75)';
       g.font = '500 26px "JetBrains Mono", monospace';
@@ -491,7 +506,7 @@ const navLight = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color
 navLight.position.set(-1.45, 0.25, 0); navLight.scale.setScalar(0.4);
 drone.add(housing, prop, pylon, navLight);
 
-/* ---------- SUNDOWN payload (axis = local Y, nose at −Y) ---------- */
+/* ---------- Payload (axis = local Y, nose at −Y) ---------- */
 const bombRig = new THREE.Group();   // position, scale, yaw, wobble
 const tiltG = new THREE.Group();     // nose-down ↔ horizontal
 const spinG = new THREE.Group();     // roll around own axis
@@ -817,9 +832,10 @@ function updateMushroom(e, appear, time) {
    ========================================================= */
 const tlList = $('tlList');
 BEATS.forEach((b, i) => {
+  if (!b) return;
   const li = document.createElement('li');
   li.tabIndex = 0;
-  li.innerHTML = `${b.stamp}<b>${b.title}</b>`;
+  li.innerHTML = `${String(b.n).padStart(2, '0')}<b>${b.name}</b>`;
   const go = () => scrollToBeat(i + 0.05);
   li.addEventListener('click', go);
   li.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
@@ -884,29 +900,31 @@ let hoverPart = null, pinnedPart = null;
 function setHover(k) { hoverPart = k; }
 function togglePin(k) { pinnedPart = pinnedPart === k ? null : k; }
 
-// Typewriter story log
-const logStamp = $('logStamp'), logPlace = $('logPlace'), logTitle = $('logTitle'), logText = $('logText');
-let typing = { text: '', start: 0 };
+// Chapter card: lines rise in one after another each time the chapter changes
+const log = $('log'), logStamp = $('logStamp'), logPlace = $('logPlace'), logTitle = $('logTitle'), logText = $('logText');
 let shownBeat = -1;
-function showBeat(i, now) {
+function showBeat(i) {
   if (i === shownBeat) return;
   shownBeat = i;
   const b = BEATS[i];
-  logStamp.textContent = b.stamp;
-  logPlace.textContent = b.place;
+  document.body.classList.toggle('hero-on', i === 0);
+  log.classList.toggle('hide', !b);
+  tlItems.forEach((li, n) => { li.classList.toggle('now', n === i - 1); li.classList.toggle('past', n < i - 1); });
+  buildMega(b ? b.mega : '');
+  if (!b) return;
+  logStamp.textContent = `Chapter ${String(b.n).padStart(2, '0')}`;
+  logPlace.textContent = b.name;
   logTitle.textContent = b.title;
-  typing = { text: b.text, start: now };
-  typedN = -1;
-  tlItems.forEach((li, n) => { li.classList.toggle('now', n === i); li.classList.toggle('past', n < i); });
-  buildMega(b.mega);
-}
-let typedN = -1;
-function updateTyping(now) {
-  const n = Math.min(Math.floor((now - typing.start) * 70), typing.text.length);
-  if (n === typedN) return;
-  typedN = n;
-  const done = n >= typing.text.length;
-  logText.innerHTML = typing.text.slice(0, n) + (done ? '' : '<span class="caret"></span>');
+  let k = 0;
+  const line = (html) => `<span class="ln" style="--d:${(0.12 + 0.09 * k++).toFixed(2)}s">${html}</span>`;
+  logText.innerHTML =
+    b.body.slice(0, b.list ? 1 : 99).map((t) => `<p>${line(t)}</p>`).join('') +
+    (b.list ? `<ul class="caps">${b.list.map((t) => `<li>${line(t)}</li>`).join('')}</ul>` : '') +
+    (b.list ? b.body.slice(1).map((t) => `<p>${line(t)}</p>`).join('') : '') +
+    (b.cta ? `<a class="btn btn-sm log-cta" href="${b.cta[1]}">${line(b.cta[0] + ' →')}</a>` : '');
+  log.classList.remove('in');
+  void log.offsetWidth;
+  log.classList.add('in');
 }
 // write text only when it changes
 const setText = (el, v) => { if (el._v !== v) { el._v = v; el.textContent = v; } };
@@ -1126,8 +1144,7 @@ function tick() {
   const sv = s;
   const mobile = isMobile();
   const beat = Math.min(7, Math.floor(sv));
-  showBeat(beat, now);
-  updateTyping(now);
+  showBeat(beat);
   updateMega(sv - beat);
 
   // ---- story curves ----
@@ -1357,7 +1374,7 @@ function tick() {
   const vel = released ? 295 * (1 - Math.exp(-(fallT * FALL_SECONDS) / 11)) + Math.sin(time * 7) * 2 : 0;
   setText(hud.vel, String(Math.max(0, Math.round(vel))).padStart(3, '0'));
   hud.bar.style.top = `${(1 - alt / 18000) * 100}%`;
-  tlFill.style.height = `${(Math.min(sv, 7) / 7) * 100}%`;
+  tlFill.style.height = `${(clamp01((sv - 1) / 6)) * 100}%`;
   cue.classList.toggle('gone', sv > 0.08);
 
   // ---- tags + reticle ----
